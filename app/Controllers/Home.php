@@ -1,10 +1,11 @@
 <?php
+
 namespace App\Controllers;
 
 class Home extends BaseController
 {
     public function index()
     {
-        return view('template'); // This will render application/views/template.php
+        return view('home');
     }
 }
