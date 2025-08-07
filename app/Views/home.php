@@ -2,6 +2,6 @@
 
 <?= $this->section('content') ?>
     <div class="alert alert-primary">
-        <h3>Welcome to ITE311-DORAIDO App Homepage!</h3>
+        <h3>Welcome to ITE311-DORAIDO App Homepageses!</h3>
     </div>
 <?= $this->endSection() ?>

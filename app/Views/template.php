@@ -9,7 +9,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">LLOYD DORAIDO</a>
+        <a class="navbar-brand" href="#">LLOYD DORAIDO IT</a>
     </div>
 </nav>
 
