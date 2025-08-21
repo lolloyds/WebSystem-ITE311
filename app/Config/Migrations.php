@@ -7,6 +7,7 @@ use CodeIgniter\Config\BaseConfig;
 class Migrations extends BaseConfig
 {
     /**
+<<<<<<< HEAD
      * --------------------------------------------------------------------------
      * Enable/Disable Migrations
      * --------------------------------------------------------------------------
@@ -15,10 +16,14 @@ class Migrations extends BaseConfig
      *
      * You should enable migrations whenever you intend to do a schema migration
      * and disable it back when you're done.
+=======
+     * Enable/Disable Migrations
+>>>>>>> 96b2349 (Initial commit)
      */
     public bool $enabled = true;
 
     /**
+<<<<<<< HEAD
      * --------------------------------------------------------------------------
      * Migrations Table
      * --------------------------------------------------------------------------
@@ -26,10 +31,19 @@ class Migrations extends BaseConfig
      * This is the name of the table that will store the current migrations state.
      * When migrations runs it will store in a database table which migration
      * files have already been run.
+=======
+     * Filesystem path where migrations are located.
+     */
+    public string $path = APPPATH . 'Database/Migrations/';
+
+    /**
+     * Migration table name
+>>>>>>> 96b2349 (Initial commit)
      */
     public string $table = 'migrations';
 
     /**
+<<<<<<< HEAD
      * --------------------------------------------------------------------------
      * Timestamp Format
      * --------------------------------------------------------------------------
@@ -45,6 +59,14 @@ class Migrations extends BaseConfig
      * - YmdHis_
      * - Y-m-d-His_
      * - Y_m_d_His_
+=======
+     * Migration type
+     */
+    public string $type = 'timestamp';
+
+    /**
+     * The timestamp format for migration files.
+>>>>>>> 96b2349 (Initial commit)
      */
     public string $timestampFormat = 'Y-m-d-His_';
 }
