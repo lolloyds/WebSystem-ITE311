@@ -1,7 +1,8 @@
-<?= $this->extend('template') ?>
+<?= $this->extend('template')?>
 
-<?= $this->section('content') ?>
-    <div class="alert alert-primary">
-        <h3>Welcome to ITE311-DORAIDO App Homepageses!</h3>
-    </div>
-<?= $this->endSection() ?>
+<?= $this->section('title')?>home<?= $this->endSection()?>
+
+<?= $this->section('content')?>
+<h1>Homepage</h1>
+<p>This is the home page.</p>
+<?= $this->endSection()?>
