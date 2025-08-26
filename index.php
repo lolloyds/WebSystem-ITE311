@@ -29,7 +29,7 @@ if (getcwd() . DIRECTORY_SEPARATOR !== FCPATH) {
 //---------------------------------------------------------------
 // BOOTSTRAP THE APPLICATION
 //---------------------------------------------------------------
-require FCPATH . '../app/Config/Paths.php';
+require FCPATH . '/app/Config/Paths.php';
 
 $paths = new Paths();
 
