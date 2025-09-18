@@ -20,6 +20,13 @@
           <li class="nav-item">
             <a class="nav-link" href="<?= base_url('contact') ?>">Contact</a>
           </li>
+          <li class="nav-item">
+            <?php if (session()->get('isAuthenticated')): ?>
+              <a class="btn btn-danger ms-2" href="<?= base_url('logout') ?>">Logout</a>
+            <?php else: ?>
+              <a class="btn btn-success ms-2" href="<?= base_url('login') ?>">Login</a>
+            <?php endif; ?>
+          </li>
         </ul>
       </div>
     </div>

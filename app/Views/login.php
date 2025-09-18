@@ -20,6 +20,7 @@
                 <?php endif; ?>
 
                 <form action="<?= base_url('login') ?>" method="post">
+                    <?= csrf_field() ?>
                     <div class="form-floating mb-3">
                         <input 
                             type="email" 

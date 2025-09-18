@@ -14,6 +14,7 @@
                 <?php endif; ?>
 
                 <form action="<?= base_url('register') ?>" method="post">
+                    <?= csrf_field() ?>
                     <div class="form-floating mb-3">
                         <input 
                             type="text" 

@@ -7,7 +7,7 @@
     </div>
 
     <div class="alert alert-success" role="alert">
-        Welcome, <?= esc(session('userEmail')) ?>!
+        Welcome, <?= esc(session('userName')) ?>!
     </div>
 
     <div class="card shadow-sm border-0 bg-dark text-light">
