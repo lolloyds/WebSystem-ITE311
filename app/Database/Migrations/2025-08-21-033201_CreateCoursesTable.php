@@ -22,7 +22,7 @@ class CreateCoursesTable extends Migration
             'description' => [
                 'type' => 'TEXT',
             ],
-            'instructor_id' => [
+            'teacher_id' => [
                 'type'       => 'INT',
                 'constraint' => 11,
                 'unsigned'   => true,
@@ -37,7 +37,7 @@ class CreateCoursesTable extends Migration
             ],
         ]);
         $this->forge->addKey('id', true);
-        $this->forge->addForeignKey('instructor_id', 'users', 'id', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('teacher_id', 'users', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('courses');
     }
 

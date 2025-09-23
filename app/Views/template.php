@@ -20,6 +20,14 @@
           <li class="nav-item">
             <a class="nav-link" href="<?= base_url('contact') ?>">Contact</a>
           </li>
+          <?php if (session()->get('isAuthenticated')): ?>
+          <?php $role = (string) session()->get('userRole'); ?>
+          <?php if ($role === 'admin'): ?>
+          <li class="nav-item">
+            <a class="nav-link" href="<?= base_url('admin/dashboard') ?>">Admin</a>
+          </li>
+          <?php endif; ?>
+          <?php endif; ?>
           <li class="nav-item">
             <?php if (session()->get('isAuthenticated')): ?>
               <a class="btn btn-danger ms-2" href="<?= base_url('logout') ?>">Logout</a>

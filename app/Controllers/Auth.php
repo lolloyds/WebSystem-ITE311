@@ -9,7 +9,14 @@ class Auth extends BaseController
     {
         // Verify if user session is active
         if (session()->get('isAuthenticated')) {
-            return redirect()->to('/dashboard');
+            $role = (string) session()->get('userRole');
+            $target = '/student/dashboard';
+            if ($role === 'admin') {
+                $target = '/admin/dashboard';
+            } elseif ($role === 'teacher') {
+                $target = '/teacher/dashboard';
+            }
+            return redirect()->to($target);
         }
 
         // Process form submission
@@ -53,8 +60,17 @@ class Auth extends BaseController
 
             // Display success message and redirect
             session()->setFlashdata('success', 'Hello ' . $userRecord['name'] . ', welcome back!');
-            
-            return redirect()->to('/dashboard');
+
+            // Role-based redirection
+            $role = (string) $userRecord['role'];
+            $redirectUrl = '/student/dashboard';
+            if ($role === 'admin') {
+                $redirectUrl = '/admin/dashboard';
+            } elseif ($role === 'teacher') {
+                $redirectUrl = '/teacher/dashboard';
+            }
+
+            return redirect()->to($redirectUrl);
         }
 
         // Display login form for GET requests
