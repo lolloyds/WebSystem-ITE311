@@ -11,26 +11,14 @@
       <a class="navbar-brand" href="<?= base_url('/') ?>">ITE311-DORAIDO</a>
       <div class="collapse navbar-collapse">
         <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="<?= base_url('/') ?>">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="<?= base_url('about') ?>">About</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="<?= base_url('contact') ?>">Contact</a>
-          </li>
           <?php if (session()->get('isAuthenticated')): ?>
           <li class="nav-item">
             <a class="nav-link" href="<?= base_url('dashboard') ?>">Dashboard</a>
-          </li> 
+          </li>
           <?php endif; ?>
           <?php if (session()->get('isAuthenticated')): ?>
           <?php $role = (string) session()->get('userRole'); ?>
           <?php if ($role === 'admin'): ?>
-          <li class="nav-item">
-            <a class="nav-link" href="<?= base_url('admin/dashboard') ?>">Admin</a>
-          </li>
           <?php endif; ?>
           <?php endif; ?>
           <li class="nav-item">

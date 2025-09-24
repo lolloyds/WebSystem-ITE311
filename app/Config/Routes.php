@@ -16,6 +16,3 @@ $routes->get('/login', 'Auth::login');
 $routes->post('/login', 'Auth::login');
 $routes->get('/logout', 'Auth::logout');
 $routes->get('/dashboard', 'Auth::dashboard');
-
-// Admin dashboard route
-$routes->get('admin/dashboard', 'Admin::dashboard');

@@ -1,7 +1,14 @@
-<?= $this->extend('template') ?>
+<?= $this->extend('template/header') ?>
 
 <?= $this->section('content') ?>
-<h1 class="h3 mb-4">Dashboard</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h3 mb-0">Dashboard</h1>
+  <div class="text-end">
+    <?php $userName = session()->get('userName'); $userRole = ucfirst((string) session()->get('userRole')); ?>
+    <div>Welcome, <strong><?= esc($userName) ?></strong></div>
+    <div class="text-muted small">Role: <?= esc($userRole) ?></div>
+  </div>
+  </div>
 
 <?php $role = $role ?? 'student'; ?>
 
