@@ -9,14 +9,7 @@ class Auth extends BaseController
     {
         // Verify if user session is active
         if (session()->get('isAuthenticated')) {
-            $role = (string) session()->get('userRole');
-            $target = '/student/dashboard';
-            if ($role === 'admin') {
-                $target = '/admin/dashboard';
-            } elseif ($role === 'teacher') {
-                $target = '/teacher/dashboard';
-            }
-            return redirect()->to($target);
+            return redirect()->to('/dashboard');
         }
 
         // Process form submission
@@ -61,16 +54,8 @@ class Auth extends BaseController
             // Display success message and redirect
             session()->setFlashdata('success', 'Hello ' . $userRecord['name'] . ', welcome back!');
 
-            // Role-based redirection
-            $role = (string) $userRecord['role'];
-            $redirectUrl = '/student/dashboard';
-            if ($role === 'admin') {
-                $redirectUrl = '/admin/dashboard';
-            } elseif ($role === 'teacher') {
-                $redirectUrl = '/teacher/dashboard';
-            }
-
-            return redirect()->to($redirectUrl);
+            // Unified dashboard redirection
+            return redirect()->to('/dashboard');
         }
 
         // Display login form for GET requests
@@ -217,8 +202,51 @@ class Auth extends BaseController
             return redirect()->to('/login');
         }
 
-        // Render dashboard interface
-        return view('dashboard');
+        $role = (string) session()->get('userRole');
+        $userId = (int) session()->get('userId');
+
+        $data = [
+            'role' => $role,
+        ];
+
+        // Load role-specific data
+        try {
+            $db = \Config\Database::connect();
+
+            if ($role === 'admin') {
+                $data['totalUsers'] = (int) $db->table('users')->countAllResults();
+                if ($db->tableExists('courses')) {
+                    $data['totalCourses'] = (int) $db->table('courses')->countAllResults();
+                } else {
+                    $data['totalCourses'] = 0;
+                }
+                $data['recentUsers'] = $db->table('users')
+                    ->select('id, name, email, role, created_at')
+                    ->orderBy('id', 'DESC')
+                    ->limit(5)
+                    ->get()
+                    ->getResultArray();
+            } elseif ($role === 'teacher') {
+                $data['myCourses'] = $db->table('courses')
+                    ->select('id, title, created_at')
+                    ->where('teacher_id', $userId)
+                    ->orderBy('id', 'DESC')
+                    ->get()
+                    ->getResultArray();
+            } elseif ($role === 'student') {
+                // If an enrollments table exists, adapt here. For now, show available courses.
+                $data['availableCourses'] = $db->table('courses')
+                    ->select('id, title, created_at')
+                    ->orderBy('id', 'DESC')
+                    ->limit(10)
+                    ->get()
+                    ->getResultArray();
+            }
+        } catch (\Throwable $e) {
+            // Fallback without DB if tables are missing
+        }
+
+        return view('auth/dashboard', $data);
     }
     
 }   
