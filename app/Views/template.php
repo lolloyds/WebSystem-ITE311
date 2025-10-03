@@ -45,6 +45,9 @@
             <li class="nav-item">
               <a class="nav-link" href="<?= base_url('dashboard') ?>"><i class="bi bi-speedometer2 me-1"></i> Dashboard</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="<?= base_url('settings') ?>"><i class="bi bi-gear-fill me-1"></i> Settings</a>
+            </li>
           <?php endif; ?>
 
           <?php if (session()->get('isAuthenticated')): ?>

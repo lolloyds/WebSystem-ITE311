@@ -16,3 +16,8 @@ $routes->get('/login', 'Auth::login');
 $routes->post('/login', 'Auth::login');
 $routes->get('/logout', 'Auth::logout');
 $routes->get('/dashboard', 'Auth::dashboard');
+
+// settings routes
+$routes->get('/settings', 'Settings::index');
+$routes->post('/settings/updateProfile', 'Settings::updateProfile');
+$routes->post('/settings/changePassword', 'Settings::changePassword');
