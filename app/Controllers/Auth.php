@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use App\Models\EnrollmentModel;
+
 class Auth extends BaseController
 {
 
@@ -173,13 +175,10 @@ class Auth extends BaseController
                     ->get()
                     ->getResultArray();
             } elseif ($role === 'student') {
-                // If an enrollments table exists, adapt here. For now, show available courses.
-                $data['availableCourses'] = $db->table('courses')
-                    ->select('id, title, created_at')
-                    ->orderBy('id', 'DESC')
-                    ->limit(10)
-                    ->get()
-                    ->getResultArray();
+                // Use EnrollmentModel to get enrolled and available courses
+                $enrollmentModel = new EnrollmentModel();
+                $data['enrolledCourses'] = $enrollmentModel->getUserEnrollments($userId);
+                $data['availableCourses'] = $enrollmentModel->getAvailableCourses($userId);
             }
         } catch (\Throwable $e) {
             // Fallback without DB if tables are missing
