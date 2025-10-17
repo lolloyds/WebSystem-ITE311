@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Welcome to CodeIgniter 4!</title>
-    <meta name="description" content="The small framework with powerful features">
+    <title>Welcome to CodeIgniter 4 - Modern PHP Framework</title>
+    <meta name="description" content="Experience the power of CodeIgniter 4 - A modern, lightweight PHP framework with powerful features for building amazing web applications">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" type="image/png" href="/favicon.ico">
 
@@ -98,23 +98,228 @@
         header .heroe {
             margin: 0 auto;
             max-width: 1100px;
-            padding: 1rem 1.75rem 1.75rem 1.75rem;
+            padding: 3rem 1.75rem 4rem 1.75rem;
+            background: linear-gradient(135deg, rgba(221, 72, 20, 0.1) 0%, rgba(247, 248, 249, 0.8) 100%);
+            border-radius: 20px;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        header .heroe::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(221, 72, 20, 0.05) 50%, transparent 70%);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+        @keyframes shimmer {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+        }
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
         }
         header .heroe h1 {
-            font-size: 2.5rem;
-            font-weight: 500;
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #dd4814 0%, #ff6b35 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            animation: fadeInUp 1s ease-out;
         }
         header .heroe h2 {
-            font-size: 1.5rem;
-            font-weight: 300;
+            font-size: 1.8rem;
+            font-weight: 400;
+            color: rgba(33, 37, 41, 0.8);
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+        .hero-description {
+            font-size: 1.2rem;
+            color: rgba(33, 37, 41, 0.7);
+            max-width: 600px;
+            margin: 0 auto 2.5rem auto;
+            line-height: 1.6;
+            animation: fadeInUp 1s ease-out 0.4s both;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 1s ease-out 0.6s both;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        .btn:hover::before {
+            left: 100%;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #dd4814 0%, #ff6b35 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(221, 72, 20, 0.3);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(221, 72, 20, 0.4);
+        }
+        .btn-secondary {
+            background: transparent;
+            color: #dd4814;
+            border-color: #dd4814;
+        }
+        .btn-secondary:hover {
+            background: #dd4814;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(221, 72, 20, 0.3);
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         section {
             margin: 0 auto;
             max-width: 1100px;
             padding: 2.5rem 1.75rem 3.5rem 1.75rem;
         }
-        section h1 {
-            margin-bottom: 2.5rem;
+        .main-content {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border-radius: 20px;
+            margin: 2rem auto;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+        .content-wrapper {
+            padding: 3rem 2rem;
+        }
+        .main-content h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .info-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        .card-icon {
+            font-size: 3rem;
+            flex-shrink: 0;
+        }
+        .card-content h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+        .card-content p {
+            color: #6c757d;
+            line-height: 1.6;
+            margin: 0;
+        }
+        .file-locations {
+            margin-top: 3rem;
+        }
+        .file-locations h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        .file-item {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-left: 4px solid #dd4814;
+        }
+        .file-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        .file-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        .file-info h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+        .file-info p {
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+        }
+        .file-info code {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9rem;
+            color: #dd4814;
+            display: inline-block;
+            word-break: break-all;
         }
         section h2 {
             font-size: 120%;
@@ -155,18 +360,87 @@
             stroke: #000;
             stroke-width: 32px;
         }
-        footer {
-            background-color: rgba(221, 72, 20, .8);
+        .modern-footer {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            margin-top: 3rem;
+        }
+        .footer-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 3rem 1.75rem 2rem 1.75rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+        }
+        .footer-section h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #ecf0f1;
+        }
+        .performance-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.8rem 1.2rem;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            color: #bdc3c7;
+        }
+        .stat-value {
+            font-weight: 600;
+            color: #ecf0f1;
+        }
+        .environment-badge {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        .footer-links a {
+            color: #bdc3c7;
+            text-decoration: none;
+            padding: 0.5rem 0;
+            transition: all 0.3s ease;
+            border-radius: 5px;
+            padding-left: 0.5rem;
+        }
+        .footer-links a:hover {
+            color: #dd4814;
+            transform: translateX(5px);
+        }
+        .footer-bottom {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1.5rem 1.75rem;
             text-align: center;
         }
-        footer .environment {
-            color: rgba(255, 255, 255, 1);
-            padding: 2rem 1.75rem;
+        .footer-info p {
+            margin: 0.5rem 0;
+            color: #bdc3c7;
+            font-size: 0.9rem;
         }
-        footer .copyrights {
-            background-color: rgba(62, 62, 62, 1);
-            color: rgba(200, 200, 200, 1);
-            padding: .25rem 1.75rem;
+        .footer-tagline {
+            font-style: italic;
+            color: #95a5a6;
         }
         @media (max-width: 629px) {
             header ul {
@@ -194,6 +468,42 @@
             header li.menu-item a:focus {
                 background-color: rgba(221, 72, 20, .7);
                 color: rgba(255, 255, 255, .8);
+            }
+            
+            /* Mobile responsive improvements */
+            header .heroe h1 {
+                font-size: 2.5rem;
+            }
+            header .heroe h2 {
+                font-size: 1.4rem;
+            }
+            .hero-description {
+                font-size: 1rem;
+            }
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            .btn {
+                width: 100%;
+                max-width: 250px;
+            }
+            .main-content h1 {
+                font-size: 2rem;
+            }
+            .info-card {
+                flex-direction: column;
+                text-align: center;
+            }
+            .file-grid {
+                grid-template-columns: 1fr;
+            }
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            .performance-stats {
+                gap: 0.8rem;
             }
         }
     </style>
@@ -224,31 +534,55 @@
     </div>
 
     <div class="heroe">
-
-        <h1>Welcome to CodeIgniter <?= CodeIgniter\CodeIgniter::CI_VERSION ?></h1>
-
-        <h2>The small framework with powerful features</h2>
-
+        <div class="hero-content">
+            <h1>Welcome to CodeIgniter <?= CodeIgniter\CodeIgniter::CI_VERSION ?></h1>
+            <h2>The small framework with powerful features</h2>
+            <p class="hero-description">Build amazing web applications with speed and simplicity. CodeIgniter 4 brings you the perfect balance of power and ease of use.</p>
+            <div class="hero-buttons">
+                <a href="https://codeigniter.com/user_guide/" class="btn btn-primary" target="_blank">Get Started</a>
+                <a href="https://github.com/codeigniter4/CodeIgniter4" class="btn btn-secondary" target="_blank">View on GitHub</a>
+            </div>
+        </div>
     </div>
 
 </header>
 
 <!-- CONTENT -->
 
-<section>
+<section class="main-content">
+    <div class="content-wrapper">
+        <h1>🚀 About this page</h1>
+        
+        <div class="info-card">
+            <div class="card-icon">📄</div>
+            <div class="card-content">
+                <h3>Dynamic Content</h3>
+                <p>The page you are looking at is being generated dynamically by CodeIgniter. This demonstrates the framework's powerful templating capabilities.</p>
+            </div>
+        </div>
 
-    <h1>About this page</h1>
-
-    <p>The page you are looking at is being generated dynamically by CodeIgniter.</p>
-
-    <p>If you would like to edit this page you will find it located at:</p>
-
-    <pre><code>app/Views/welcome_message.php</code></pre>
-
-    <p>The corresponding controller for this page can be found at:</p>
-
-    <pre><code>app/Controllers/Home.php</code></pre>
-
+        <div class="file-locations">
+            <h2>📁 File Locations</h2>
+            <div class="file-grid">
+                <div class="file-item">
+                    <div class="file-icon">🎨</div>
+                    <div class="file-info">
+                        <h4>View File</h4>
+                        <p>Edit this welcome page:</p>
+                        <code>app/Views/welcome_message.php</code>
+                    </div>
+                </div>
+                <div class="file-item">
+                    <div class="file-icon">🎮</div>
+                    <div class="file-info">
+                        <h4>Controller</h4>
+                        <p>Handle the page logic:</p>
+                        <code>app/Controllers/Home.php</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
 
 <div class="further">
@@ -294,22 +628,43 @@
 
 <!-- FOOTER: DEBUG INFO + COPYRIGHTS -->
 
-<footer>
-    <div class="environment">
-
-        <p>Page rendered in {elapsed_time} seconds using {memory_usage} MB of memory.</p>
-
-        <p>Environment: <?= ENVIRONMENT ?></p>
-
+<footer class="modern-footer">
+    <div class="footer-content">
+        <div class="footer-section">
+            <h3>🚀 Performance</h3>
+            <div class="performance-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Render Time</span>
+                    <span class="stat-value">{elapsed_time}s</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Memory Usage</span>
+                    <span class="stat-value">{memory_usage} MB</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Environment</span>
+                    <span class="stat-value environment-badge"><?= ENVIRONMENT ?></span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-section">
+            <h3>🔗 Quick Links</h3>
+            <div class="footer-links">
+                <a href="https://codeigniter.com/user_guide/" target="_blank">📚 Documentation</a>
+                <a href="https://forum.codeigniter.com/" target="_blank">💬 Community</a>
+                <a href="https://github.com/codeigniter4/CodeIgniter4" target="_blank">🐙 GitHub</a>
+                <a href="https://codeigniter.com/contribute" target="_blank">🤝 Contribute</a>
+            </div>
+        </div>
     </div>
-
-    <div class="copyrights">
-
-        <p>&copy; <?= date('Y') ?> CodeIgniter Foundation. CodeIgniter is open source project released under the MIT
-            open source licence.</p>
-
+    
+    <div class="footer-bottom">
+        <div class="footer-info">
+            <p>&copy; <?= date('Y') ?> CodeIgniter Foundation. CodeIgniter is an open source project released under the MIT license.</p>
+            <p class="footer-tagline">Built with ❤️ by the CodeIgniter community</p>
+        </div>
     </div>
-
 </footer>
 
 <!-- SCRIPTS -->

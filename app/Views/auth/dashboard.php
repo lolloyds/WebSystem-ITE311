@@ -119,28 +119,6 @@
             </div>
         </div>
     </div>
-    
-    <!-- Teacher Dashboard -->
-    <div class="card shadow-sm border-0 rounded-3">
-        <div class="card-header bg-primary text-white fw-semibold d-flex justify-content-between align-items-center">
-            <span><i class="bi bi-journal-text me-2"></i> My Courses ✏️</span>
-            <a href="#" class="btn btn-sm btn-light text-primary fw-semibold">
-                <i class="bi bi-plus-circle me-1"></i> Create Course ➕
-            </a>
-        </div>
-        <ul class="list-group list-group-flush">
-            <?php if (!empty($myCourses)): ?>
-                <?php foreach ($myCourses as $c): ?>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span><i class="bi bi-book me-2 text-success"></i> <?= esc($c['title']) ?> 📖</span>
-                        <span class="text-muted small"><?= esc($c['created_at'] ?? '') ?></span>
-                    </li>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <li class="list-group-item text-muted">No courses yet 😔</li>
-            <?php endif; ?>
-        </ul>
-    </div>
 
 <?php else: ?>
     <!-- Student Dashboard -->
