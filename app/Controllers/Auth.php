@@ -57,8 +57,14 @@ class Auth extends BaseController
             $roleLabel = ucfirst((string) $userRecord['role']);
             session()->setFlashdata('success', 'Welcome back, ' . $userRecord['name'] . ' (' . $roleLabel . ').');
 
-            // All users go to main dashboard
-            return redirect()->to('/dashboard');
+            // Role-based redirection
+            $userRole = (string) $userRecord['role'];
+            if ($userRole === 'student') {
+                return redirect()->to('/announcements');
+            } else {
+                // Admins and teachers go to dashboard
+                return redirect()->to('/dashboard');
+            }
         }
 
         // Display login form for GET requests

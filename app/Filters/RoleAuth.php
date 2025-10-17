@@ -76,7 +76,7 @@ class RoleAuth implements FilterInterface
             // Unknown role - redirect to announcements
             session()->setFlashdata('error', 'Access Denied: Insufficient Permissions');
             return redirect()->to('/announcements');
-        }
+        }   
     }
 
     /**
