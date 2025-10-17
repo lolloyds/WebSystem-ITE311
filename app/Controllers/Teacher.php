@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-class Admin extends BaseController
+class Teacher extends BaseController
 {
     public function dashboard()
     {
@@ -14,15 +14,15 @@ class Admin extends BaseController
 
         // Verify user role
         $userRole = session()->get('userRole');
-        if ($userRole !== 'admin') {
+        if ($userRole !== 'teacher') {
             session()->setFlashdata('error', 'Access denied: Insufficient permissions.');
             return redirect()->to('/announcements');
         }
 
         $data = [
-            'title' => 'Admin Dashboard'
+            'title' => 'Teacher Dashboard'
         ];
 
-        return view('admin_dashboard', $data);
+        return view('teacher_dashboard', $data);
     }
 }

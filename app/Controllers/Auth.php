@@ -57,7 +57,7 @@ class Auth extends BaseController
             $roleLabel = ucfirst((string) $userRecord['role']);
             session()->setFlashdata('success', 'Welcome back, ' . $userRecord['name'] . ' (' . $roleLabel . ').');
 
-            // Unified dashboard redirection
+            // All users go to main dashboard
             return redirect()->to('/dashboard');
         }
 
@@ -149,6 +149,7 @@ class Auth extends BaseController
         $data = [
             'role' => $role,
         ];
+
 
         // Load role-specific data
         try {

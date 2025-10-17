@@ -25,3 +25,15 @@ $routes->post('/settings/changePassword', 'Settings::changePassword');
 // course routes
 $routes->post('/course/enroll', 'Course::enroll');
 $routes->get('/course/view/(:num)', 'Course::view/$1');
+
+// announcements route
+$routes->get('/announcements', 'Announcement::index');
+
+// role-based dashboard routes (protected by RoleAuth filter)
+$routes->group('teacher', ['filter' => 'roleauth'], function($routes) {
+    $routes->get('dashboard', 'Teacher::dashboard');
+});
+
+$routes->group('admin', ['filter' => 'roleauth'], function($routes) {
+    $routes->get('dashboard', 'Admin::dashboard');
+});

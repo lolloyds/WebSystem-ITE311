@@ -1,4 +1,4 @@
-<?= $this->extend('template/header') ?>
+<?= $this->extend('template') ?>
 
 <?= $this->section('content') ?>
 
@@ -21,7 +21,19 @@
     </div>
 </div>
 
+
 <?php if ($role === 'admin'): ?>
+    <!-- Admin Welcome Message -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body text-center p-5">
+                    <h2 class="card-title text-dark">Welcome admin!</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <!-- Admin Dashboard -->
     <div class="row g-3">
         <!-- Total Users -->
@@ -97,6 +109,17 @@
     </div>
 
 <?php elseif ($role === 'teacher'): ?>
+    <!-- Teacher Welcome Message -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body text-center p-5">
+                    <h2 class="card-title text-dark">Welcome Teacher!</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <!-- Teacher Dashboard -->
     <div class="card shadow-sm border-0 rounded-3">
         <div class="card-header bg-primary text-white fw-semibold d-flex justify-content-between align-items-center">
