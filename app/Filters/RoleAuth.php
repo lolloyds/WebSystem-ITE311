@@ -37,9 +37,10 @@ class RoleAuth implements FilterInterface
 
         // Define role-based access rules
         if ($userRole === 'admin') {
-            // Admin can access any route starting with /admin, plus general routes
-            if (str_starts_with($currentURI, '/admin')) {
-                // Allow admin routes
+            // Admin can access any route starting with /admin, plus general routes, and materials routes
+            if (str_starts_with($currentURI, '/admin') ||
+                str_starts_with($currentURI, '/materials')) {
+                // Allow admin routes and materials routes
                 return;
             } elseif (in_array($currentURI, ['/', '/about', '/contact', '/announcements', '/dashboard', '/settings', '/login', '/register', '/logout'])) {
                 // Allow general routes
@@ -49,9 +50,10 @@ class RoleAuth implements FilterInterface
                 return redirect()->to('/announcements');
             }
         } elseif ($userRole === 'teacher') {
-            // Teacher can access /teacher routes and general routes
-            if (str_starts_with($currentURI, '/teacher')) {
-                // Allow teacher routes
+            // Teacher can access /teacher routes, general routes, and materials routes
+            if (str_starts_with($currentURI, '/teacher') ||
+                str_starts_with($currentURI, '/materials')) {
+                // Allow teacher routes and materials routes
                 return;
             } elseif (in_array($currentURI, ['/', '/about', '/contact', '/announcements', '/dashboard', '/settings', '/login', '/register', '/logout'])) {
                 // Allow general routes
@@ -61,9 +63,11 @@ class RoleAuth implements FilterInterface
                 return redirect()->to('/announcements');
             }
         } elseif ($userRole === 'student') {
-            // Student can access /student routes, /announcements, and general routes
-            if (str_starts_with($currentURI, '/student') || $currentURI === '/announcements') {
-                // Allow student-specific routes and announcements
+            // Student can access /student routes, /announcements, general routes, and materials download
+            if (str_starts_with($currentURI, '/student') ||
+                $currentURI === '/announcements' ||
+                str_starts_with($currentURI, '/materials/download')) {
+                // Allow student-specific routes, announcements, and materials download
                 return;
             } elseif (in_array($currentURI, ['/', '/about', '/contact', '/dashboard', '/settings', '/login', '/register', '/logout'])) {
                 // Allow general routes
@@ -76,7 +80,7 @@ class RoleAuth implements FilterInterface
             // Unknown role - redirect to announcements
             session()->setFlashdata('error', 'Access Denied: Insufficient Permissions');
             return redirect()->to('/announcements');
-        }   
+        }
     }
 
     /**
