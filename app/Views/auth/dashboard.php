@@ -109,18 +109,32 @@
     </div>
 
 <?php elseif ($role === 'teacher'): ?>
-    <!-- Teacher Welcome Message -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-body text-center p-5">
-                    <h2 class="card-title text-dark">Welcome Teacher!</h2>
-                </div>
-            </div>
+    <!-- Teacher Dashboard -->
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-primary text-white fw-semibold d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-journal-text me-2"></i> My Courses ✏️</span>
+            <a href="#" class="btn btn-sm btn-light text-primary fw-semibold">
+                <i class="bi bi-plus-circle me-1"></i> Create Course ➕
+            </a>
         </div>
+        <ul class="list-group list-group-flush">
+            <?php if (!empty($myCourses)): ?>
+                <?php foreach ($myCourses as $c): ?>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <span><i class="bi bi-book me-2 text-success"></i> <?= esc($c['title']) ?> 📖</span>
+                            <span class="text-muted small">Created: <?= esc($c['created_at'] ?? '') ?></span>
+                        </div>
+                        <a href="<?= base_url('materials/upload/' . $c['id']) ?>" class="btn btn-sm btn-primary">
+                            <i class="bi bi-upload me-1"></i> Upload Materials
+                        </a>
+                    </li>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <li class="list-group-item text-muted">No courses yet 😔</li>
+            <?php endif; ?>
+        </ul>
     </div>
-
-<?php else: ?>
     <!-- Student Dashboard -->
     <div class="row g-3">
         <!-- Enrolled Courses Section -->
