@@ -135,6 +135,8 @@
             <?php endif; ?>
         </ul>
     </div>
+
+<?php elseif ($role === 'student'): ?>
     <!-- Student Dashboard -->
     <div class="row g-3">
         <!-- Enrolled Courses Section -->
