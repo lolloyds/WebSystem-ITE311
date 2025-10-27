@@ -44,3 +44,7 @@ $routes->post('materials/upload/(:num)', 'Materials::upload/$1');
 $routes->get('materials/delete/(:num)', 'Materials::delete/$1');
 $routes->get('materials/view/(:num)', 'Materials::viewFile/$1');
 $routes->get('materials/download/(:num)', 'Materials::download/$1');
+
+// Notifications routes
+$routes->get('notifications', 'Notifications::get');
+$routes->post('notifications/mark_read/(:num)', 'Notifications::markAsRead/$1');
