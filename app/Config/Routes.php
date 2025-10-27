@@ -36,11 +36,11 @@ $routes->group('teacher', ['filter' => 'roleauth'], function($routes) {
 
 $routes->group('admin', ['filter' => 'roleauth'], function($routes) {
     $routes->get('dashboard', 'Admin::dashboard');
-    $routes->get('course/(:num)/upload', 'Materials::upload/$1');
 });
 
 // Materials routes
 $routes->get('materials/upload/(:num)', 'Materials::upload/$1');
 $routes->post('materials/upload/(:num)', 'Materials::upload/$1');
 $routes->get('materials/delete/(:num)', 'Materials::delete/$1');
+$routes->get('materials/view/(:num)', 'Materials::viewFile/$1');
 $routes->get('materials/download/(:num)', 'Materials::download/$1');

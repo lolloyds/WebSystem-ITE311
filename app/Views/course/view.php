@@ -21,8 +21,10 @@
     <div class="row">
         <div class="col-12">
             <div class="card shadow-sm">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Course Materials</h5>
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-folder-fill me-2"></i> Course Materials
+                    </h5>
                 </div>
                 <div class="card-body">
                     <?php
@@ -31,18 +33,32 @@
                     ?>
 
                     <?php if (empty($materials)): ?>
-                        <p class="text-muted">No materials available for this course yet.</p>
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            No materials available for this course yet. Check back later!
+                        </div>
                     <?php else: ?>
                         <div class="list-group">
                             <?php foreach ($materials as $material): ?>
                                 <div class="list-group-item d-flex justify-content-between align-items-center">
                                     <div>
-                                        <h6 class="mb-1"><?= esc($material['file_name']) ?></h6>
-                                        <small class="text-muted">Uploaded: <?= date('M d, Y H:i', strtotime($material['created_at'])) ?></small>
+                                        <h6 class="mb-1">
+                                            <i class="bi bi-file-earmark me-2 text-primary"></i>
+                                            <?= esc($material['file_name']) ?>
+                                        </h6>
+                                        <small class="text-muted">
+                                            <i class="bi bi-clock me-1"></i>
+                                            Uploaded: <?= date('M d, Y H:i', strtotime($material['created_at'])) ?>
+                                        </small>
                                     </div>
-                                    <a href="<?= site_url('materials/download/' . $material['id']) ?>" class="btn btn-primary btn-sm">
-                                        <i class="fas fa-download"></i> Download
-                                    </a>
+                                    <div class="d-flex gap-2">
+                                        <a href="<?= site_url('materials/view/' . $material['id']) ?>" class="btn btn-success btn-sm">
+                                            <i class="bi bi-eye me-1"></i> View
+                                        </a>
+                                        <a href="<?= site_url('materials/download/' . $material['id']) ?>" class="btn btn-primary btn-sm">
+                                            <i class="bi bi-download me-1"></i> Download
+                                        </a>
+                                    </div>
                                 </div>
                             <?php endforeach; ?>
                         </div>

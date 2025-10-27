@@ -72,8 +72,11 @@
                                             Uploaded: <?= date('M d, Y H:i', strtotime($material['created_at'])) ?>
                                         </small>
                                     </div>
-                                    <div>
-                                        <a href="<?= site_url('materials/download/' . $material['id']) ?>" class="btn btn-success btn-sm me-2">
+                                    <div class="d-flex gap-2">
+                                        <a href="<?= site_url('materials/view/' . $material['id']) ?>" class="btn btn-info btn-sm">
+                                            <i class="fas fa-eye me-1"></i> View
+                                        </a>
+                                        <a href="<?= site_url('materials/download/' . $material['id']) ?>" class="btn btn-success btn-sm">
                                             <i class="fas fa-download me-1"></i> Download
                                         </a>
                                         <a href="<?= site_url('materials/delete/' . $material['id']) ?>" class="btn btn-danger btn-sm"

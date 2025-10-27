@@ -41,8 +41,10 @@
                                             <h6 class="card-title"><?= esc($course['title']) ?></h6>
                                             <p class="card-text text-truncate"><?= esc($course['description']) ?></p>
                                             <p class="card-text"><small class="text-muted">Teacher: <?= esc($course['teacher_name']) ?></small></p>
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <a href="<?= site_url('materials/upload/' . $course['id']) ?>" class="btn btn-primary btn-sm">Upload Material</a>
+                                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                                <a href="<?= site_url('materials/upload/' . $course['id']) ?>" class="btn btn-primary btn-sm">
+                                                    <i class="bi bi-upload me-1"></i> Upload Material
+                                                </a>
                                                 <small class="text-muted">Created: <?= date('M d, Y', strtotime($course['created_at'])) ?></small>
                                             </div>
                                         </div>

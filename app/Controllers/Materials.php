@@ -51,7 +51,7 @@ class Materials extends BaseController
             return redirect()->to('/teacher/dashboard');
         }
 
-        if ($this->request->getMethod() === 'post') {
+        if ($this->request->getMethod() === 'POST') {
             return $this->handleUpload($course_id);
         }
 
@@ -98,8 +98,8 @@ class Materials extends BaseController
         // Generate unique filename
         $newName = $file->getRandomName();
 
-        // Move file to uploads directory
-        $uploadPath = FCPATH . 'uploads/materials/';
+        // Move file to writable uploads directory
+        $uploadPath = WRITEPATH . 'uploads' . DIRECTORY_SEPARATOR . 'materials' . DIRECTORY_SEPARATOR;
         if (!is_dir($uploadPath)) {
             mkdir($uploadPath, 0755, true);
         }
@@ -113,7 +113,7 @@ class Materials extends BaseController
         $materialData = [
             'course_id' => $course_id,
             'file_name' => $file->getClientName(),
-            'file_path' => 'uploads/materials/' . $newName,
+            'file_path' => 'writable/uploads/materials/' . $newName,
         ];
 
         if ($this->materialModel->insertMaterial($materialData)) {
@@ -163,14 +163,21 @@ class Materials extends BaseController
         $db = \Config\Database::connect();
         $course = $db->table('courses')->where('id', $material['course_id'])->get()->getRowArray();
 
-        // Check permissions
+        // Check permissions - only teachers need to check ownership
         if ($userRole === 'teacher' && $course['teacher_id'] != $session->get('userId')) {
             session()->setFlashdata('error', 'Access denied: You can only delete materials from your own courses.');
             return redirect()->to('/teacher/dashboard');
         }
+        
+        // Admins can delete materials from any course
 
         // Delete file from filesystem
-        $filePath = FCPATH . $material['file_path'];
+        if (strpos($material['file_path'], 'writable/') === 0) {
+            $filePath = WRITEPATH . str_replace('writable/', '', $material['file_path']);
+        } else {
+            $filePath = FCPATH . $material['file_path'];
+        }
+        
         if (file_exists($filePath)) {
             unlink($filePath);
         }
@@ -211,17 +218,26 @@ class Materials extends BaseController
             throw new \CodeIgniter\Exceptions\PageNotFoundException('Material not found');
         }
 
-        // Check if user is enrolled in the course
+        // Check if user is enrolled in the course (admins can download without enrollment)
         $user_id = $session->get('userId');
-        $isEnrolled = $this->enrollmentModel->isAlreadyEnrolled($user_id, $material['course_id']);
+        $userRole = $session->get('userRole');
+        
+        // Admins can download materials without being enrolled
+        if ($userRole !== 'admin') {
+            $isEnrolled = $this->enrollmentModel->isAlreadyEnrolled($user_id, $material['course_id']);
 
-        if (!$isEnrolled) {
-            session()->setFlashdata('error', 'Access denied: You must be enrolled in the course to download materials.');
-            return redirect()->to('/announcements');
+            if (!$isEnrolled) {
+                session()->setFlashdata('error', 'Access denied: You must be enrolled in the course to download materials.');
+                return redirect()->to('/announcements');
+            }
         }
 
-        // Get file path
-        $filePath = FCPATH . $material['file_path'];
+        // Get file path - use WRITEPATH for writable directory
+        if (strpos($material['file_path'], 'writable/') === 0) {
+            $filePath = WRITEPATH . str_replace('writable/', '', $material['file_path']);
+        } else {
+            $filePath = FCPATH . $material['file_path'];
+        }
 
         if (!file_exists($filePath)) {
             throw new \CodeIgniter\Exceptions\PageNotFoundException('File not found');
@@ -229,5 +245,97 @@ class Materials extends BaseController
 
         // Force download
         return $this->response->download($filePath, null, true)->setFileName($material['file_name']);
+    }
+
+    /**
+     * View a material file in the browser
+     *
+     * @param int $material_id Material ID
+     * @return \CodeIgniter\HTTP\ResponseInterface
+     */
+    public function viewFile($material_id)
+    {
+        // Check if user is logged in
+        $session = session();
+        if (!$session->get('isAuthenticated')) {
+            session()->setFlashdata('error', 'You must be logged in to view materials.');
+            return redirect()->to('/login');
+        }
+
+        // Get material details
+        $material = $this->materialModel->getMaterialById($material_id);
+        if (!$material) {
+            throw new \CodeIgniter\Exceptions\PageNotFoundException('Material not found');
+        }
+
+        // Check if user is enrolled in the course (admins can view without enrollment)
+        $user_id = $session->get('userId');
+        $userRole = $session->get('userRole');
+        
+        // Admins can view materials without being enrolled
+        if ($userRole !== 'admin') {
+            $isEnrolled = $this->enrollmentModel->isAlreadyEnrolled($user_id, $material['course_id']);
+
+            if (!$isEnrolled) {
+                session()->setFlashdata('error', 'Access denied: You must be enrolled in the course to view materials.');
+                return redirect()->to('/announcements');
+            }
+        }
+
+        // Get file path - use WRITEPATH for writable directory
+        if (strpos($material['file_path'], 'writable/') === 0) {
+            $filePath = WRITEPATH . str_replace('writable/', '', $material['file_path']);
+        } else {
+            $filePath = FCPATH . $material['file_path'];
+        }
+
+        if (!file_exists($filePath)) {
+            throw new \CodeIgniter\Exceptions\PageNotFoundException('File not found');
+        }
+
+        // Get file extension to determine if it can be viewed in browser
+        $ext = strtolower(pathinfo($material['file_name'], PATHINFO_EXTENSION));
+        $viewableExtensions = ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'txt', 'html', 'htm', 'xml'];
+
+        if (!in_array($ext, $viewableExtensions)) {
+            // If file cannot be viewed in browser, redirect to download
+            return redirect()->to('materials/download/' . $material_id);
+        }
+
+        // Set appropriate content type for viewing
+        $contentType = $this->getContentType($ext);
+
+        // Read file contents
+        $fileContent = file_get_contents($filePath);
+
+        // Return file for inline viewing - explicitly set Content-Disposition to inline
+        return $this->response
+            ->setContentType($contentType)
+            ->setHeader('Content-Disposition', 'inline')
+            ->setHeader('Content-Length', (string) filesize($filePath))
+            ->setBody($fileContent);
+    }
+
+    /**
+     * Get content type based on file extension
+     *
+     * @param string $ext File extension
+     * @return string Content type
+     */
+    private function getContentType($ext)
+    {
+        $contentTypes = [
+            'pdf' => 'application/pdf',
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'gif' => 'image/gif',
+            'txt' => 'text/plain',
+            'html' => 'text/html',
+            'htm' => 'text/html',
+            'xml' => 'application/xml',
+        ];
+
+        return $contentTypes[$ext] ?? 'application/octet-stream';
     }
 }
