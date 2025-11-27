@@ -102,10 +102,56 @@ class Course extends BaseController
      * @param int $id Course ID
      * @return string
      */
+    public function index()
+    {
+        $db = \Config\Database::connect();
+
+        $courses = $db->table('courses')
+                    ->select('courses.*, users.name as teacher_name')
+                    ->join('users', 'users.id = courses.teacher_id', 'left')
+                    ->orderBy('courses.created_at', 'DESC')
+                    ->get()
+                    ->getResultArray();
+
+        $data['courses'] = $courses;
+        return view('course/index', $data);
+    }
+
+    public function search()
+    {
+        $request = $this->request;
+        $searchTerm = $request->getGet('q') ?? '';
+
+        $db = \Config\Database::connect();
+        $builder = $db->table('courses')
+                    ->select('courses.*, users.name as teacher_name')
+                    ->join('users', 'users.id = courses.teacher_id', 'left');
+
+        if (!empty($searchTerm)) {
+            $builder->groupStart()
+                    ->like('courses.title', $searchTerm)
+                    ->orLike('courses.description', $searchTerm)
+                    ->groupEnd();
+        }
+
+        $courses = $builder->orderBy('courses.created_at', 'DESC')
+                           ->limit(50)
+                           ->get()
+                           ->getResultArray();
+
+        if ($request->isAJAX()) {
+            return $this->response->setJSON($courses);
+        }
+
+        $data['courses'] = $courses;
+        $data['search_term'] = $searchTerm;
+        return view('course/index', $data);
+    }
+
     public function view($id)
     {
         $db = \Config\Database::connect();
-        
+
         $course = $db->table('courses')
                     ->where('id', $id)
                     ->get()

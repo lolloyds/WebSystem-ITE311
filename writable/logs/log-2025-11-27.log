@@ -1,0 +1,870 @@
+ERROR - 2025-11-27 15:49:43 --> mysqli_sql_exception: Can't create table `lms_doraido`.`notifications` (errno: 150 "Foreign key constraint is incorrectly formed") in C:\xampp\htdocs\ITE311-DORAIDO\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\MySQLi\Connection.php(327): mysqli->query('CREATE TABLE `n...', 0)
+#1 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `n...')
+#2 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `n...')
+#3 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\Forge.php(570): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `n...')
+#4 C:\xampp\htdocs\ITE311-DORAIDO\app\Database\Migrations\2025-01-15-000001_CreateNotificationsTable.php(21): CodeIgniter\Database\Forge->createTable('notifications')
+#5 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\MigrationRunner.php(876): App\Database\Migrations\CreateNotificationsTable->up()
+#6 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\MigrationRunner.php(182): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 C:\xampp\htdocs\ITE311-DORAIDO\system\Commands\Database\Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 C:\xampp\htdocs\ITE311-DORAIDO\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 C:\xampp\htdocs\ITE311-DORAIDO\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 C:\xampp\htdocs\ITE311-DORAIDO\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#11 C:\xampp\htdocs\ITE311-DORAIDO\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#12 C:\xampp\htdocs\ITE311-DORAIDO\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#13 {main}
+ERROR - 2025-11-27 16:00:47 --> mysqli_sql_exception: Unknown column 'courses.code' in 'where clause' in C:\xampp\htdocs\ITE311-DORAIDO\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\MySQLi\Connection.php(327): mysqli->query('SELECT `courses...', 0)
+#1 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `courses...')
+#2 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `courses...')
+#3 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `courses...', Array, false)
+#4 C:\xampp\htdocs\ITE311-DORAIDO\app\Controllers\Course.php(140): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\xampp\htdocs\ITE311-DORAIDO\system\CodeIgniter.php(933): App\Controllers\Course->search()
+#6 C:\xampp\htdocs\ITE311-DORAIDO\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Course))
+#7 C:\xampp\htdocs\ITE311-DORAIDO\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#8 C:\xampp\htdocs\ITE311-DORAIDO\system\Boot.php(363): CodeIgniter\CodeIgniter->run()
+#9 C:\xampp\htdocs\ITE311-DORAIDO\system\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#10 C:\xampp\htdocs\ITE311-DORAIDO\index.php(38): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#11 {main}
+CRITICAL - 2025-11-27 16:00:47 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'courses.code' in 'where clause'
+[Method: GET, Route: courses/search]
+in SYSTEMPATH\Database\BaseConnection.php on line 684.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE :courses.title: ESCAPE \'!\'
+OR  `courses`.`description` LIKE :courses.description: ESCAPE \'!\'
+OR  `courses`.`code` LIKE :courses.code: ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50', [...], false)
+ 2 APPPATH\Controllers\Course.php(140): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Course->search()
+ 4 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Course))
+ 5 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 7 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 8 FCPATH\index.php(38): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-11-27 16:00:47 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'courses.code' in 'where clause'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%intro%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%intro%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%intro%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50')
+ 2 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%intro%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%intro%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%intro%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE :courses.title: ESCAPE \'!\'
+OR  `courses`.`description` LIKE :courses.description: ESCAPE \'!\'
+OR  `courses`.`code` LIKE :courses.code: ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50', [...], false)
+ 4 APPPATH\Controllers\Course.php(140): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Course->search()
+ 6 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Course))
+ 7 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(38): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-11-27 16:00:47 --> [Caused by] mysqli_sql_exception: Unknown column 'courses.code' in 'where clause'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%intro%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%intro%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%intro%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%intro%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%intro%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%intro%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50')
+ 3 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%intro%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%intro%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%intro%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE :courses.title: ESCAPE \'!\'
+OR  `courses`.`description` LIKE :courses.description: ESCAPE \'!\'
+OR  `courses`.`code` LIKE :courses.code: ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50', [...], false)
+ 5 APPPATH\Controllers\Course.php(140): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Course->search()
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Course))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(38): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2025-11-27 16:00:57 --> mysqli_sql_exception: Unknown column 'courses.code' in 'where clause' in C:\xampp\htdocs\ITE311-DORAIDO\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\MySQLi\Connection.php(327): mysqli->query('SELECT `courses...', 0)
+#1 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `courses...')
+#2 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `courses...')
+#3 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `courses...', Array, false)
+#4 C:\xampp\htdocs\ITE311-DORAIDO\app\Controllers\Course.php(140): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\xampp\htdocs\ITE311-DORAIDO\system\CodeIgniter.php(933): App\Controllers\Course->search()
+#6 C:\xampp\htdocs\ITE311-DORAIDO\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Course))
+#7 C:\xampp\htdocs\ITE311-DORAIDO\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#8 C:\xampp\htdocs\ITE311-DORAIDO\system\Boot.php(363): CodeIgniter\CodeIgniter->run()
+#9 C:\xampp\htdocs\ITE311-DORAIDO\system\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#10 C:\xampp\htdocs\ITE311-DORAIDO\index.php(38): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#11 {main}
+CRITICAL - 2025-11-27 16:00:57 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'courses.code' in 'where clause'
+[Method: GET, Route: courses/search]
+in SYSTEMPATH\Database\BaseConnection.php on line 684.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE :courses.title: ESCAPE \'!\'
+OR  `courses`.`description` LIKE :courses.description: ESCAPE \'!\'
+OR  `courses`.`code` LIKE :courses.code: ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50', [...], false)
+ 2 APPPATH\Controllers\Course.php(140): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Course->search()
+ 4 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Course))
+ 5 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 7 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 8 FCPATH\index.php(38): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-11-27 16:00:57 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'courses.code' in 'where clause'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%introduction%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50')
+ 2 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%introduction%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE :courses.title: ESCAPE \'!\'
+OR  `courses`.`description` LIKE :courses.description: ESCAPE \'!\'
+OR  `courses`.`code` LIKE :courses.code: ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50', [...], false)
+ 4 APPPATH\Controllers\Course.php(140): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Course->search()
+ 6 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Course))
+ 7 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(38): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-11-27 16:00:57 --> [Caused by] mysqli_sql_exception: Unknown column 'courses.code' in 'where clause'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%introduction%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%introduction%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50')
+ 3 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%introduction%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE :courses.title: ESCAPE \'!\'
+OR  `courses`.`description` LIKE :courses.description: ESCAPE \'!\'
+OR  `courses`.`code` LIKE :courses.code: ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50', [...], false)
+ 5 APPPATH\Controllers\Course.php(140): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Course->search()
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Course))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(38): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2025-11-27 16:00:59 --> mysqli_sql_exception: Unknown column 'courses.code' in 'where clause' in C:\xampp\htdocs\ITE311-DORAIDO\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\MySQLi\Connection.php(327): mysqli->query('SELECT `courses...', 0)
+#1 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `courses...')
+#2 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `courses...')
+#3 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `courses...', Array, false)
+#4 C:\xampp\htdocs\ITE311-DORAIDO\app\Controllers\Course.php(140): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\xampp\htdocs\ITE311-DORAIDO\system\CodeIgniter.php(933): App\Controllers\Course->search()
+#6 C:\xampp\htdocs\ITE311-DORAIDO\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Course))
+#7 C:\xampp\htdocs\ITE311-DORAIDO\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#8 C:\xampp\htdocs\ITE311-DORAIDO\system\Boot.php(363): CodeIgniter\CodeIgniter->run()
+#9 C:\xampp\htdocs\ITE311-DORAIDO\system\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#10 C:\xampp\htdocs\ITE311-DORAIDO\index.php(38): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#11 {main}
+CRITICAL - 2025-11-27 16:00:59 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'courses.code' in 'where clause'
+[Method: GET, Route: courses/search]
+in SYSTEMPATH\Database\BaseConnection.php on line 684.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE :courses.title: ESCAPE \'!\'
+OR  `courses`.`description` LIKE :courses.description: ESCAPE \'!\'
+OR  `courses`.`code` LIKE :courses.code: ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50', [...], false)
+ 2 APPPATH\Controllers\Course.php(140): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Course->search()
+ 4 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Course))
+ 5 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 7 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 8 FCPATH\index.php(38): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-11-27 16:00:59 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'courses.code' in 'where clause'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%introduction%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50')
+ 2 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%introduction%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE :courses.title: ESCAPE \'!\'
+OR  `courses`.`description` LIKE :courses.description: ESCAPE \'!\'
+OR  `courses`.`code` LIKE :courses.code: ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50', [...], false)
+ 4 APPPATH\Controllers\Course.php(140): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Course->search()
+ 6 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Course))
+ 7 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(38): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-11-27 16:00:59 --> [Caused by] mysqli_sql_exception: Unknown column 'courses.code' in 'where clause'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%introduction%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%introduction%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50')
+ 3 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%introduction%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE :courses.title: ESCAPE \'!\'
+OR  `courses`.`description` LIKE :courses.description: ESCAPE \'!\'
+OR  `courses`.`code` LIKE :courses.code: ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50', [...], false)
+ 5 APPPATH\Controllers\Course.php(140): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Course->search()
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Course))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(38): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2025-11-27 16:00:59 --> mysqli_sql_exception: Unknown column 'courses.code' in 'where clause' in C:\xampp\htdocs\ITE311-DORAIDO\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\MySQLi\Connection.php(327): mysqli->query('SELECT `courses...', 0)
+#1 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `courses...')
+#2 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `courses...')
+#3 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `courses...', Array, false)
+#4 C:\xampp\htdocs\ITE311-DORAIDO\app\Controllers\Course.php(140): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\xampp\htdocs\ITE311-DORAIDO\system\CodeIgniter.php(933): App\Controllers\Course->search()
+#6 C:\xampp\htdocs\ITE311-DORAIDO\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Course))
+#7 C:\xampp\htdocs\ITE311-DORAIDO\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#8 C:\xampp\htdocs\ITE311-DORAIDO\system\Boot.php(363): CodeIgniter\CodeIgniter->run()
+#9 C:\xampp\htdocs\ITE311-DORAIDO\system\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#10 C:\xampp\htdocs\ITE311-DORAIDO\index.php(38): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#11 {main}
+CRITICAL - 2025-11-27 16:00:59 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'courses.code' in 'where clause'
+[Method: GET, Route: courses/search]
+in SYSTEMPATH\Database\BaseConnection.php on line 684.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE :courses.title: ESCAPE \'!\'
+OR  `courses`.`description` LIKE :courses.description: ESCAPE \'!\'
+OR  `courses`.`code` LIKE :courses.code: ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50', [...], false)
+ 2 APPPATH\Controllers\Course.php(140): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Course->search()
+ 4 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Course))
+ 5 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 7 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 8 FCPATH\index.php(38): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-11-27 16:00:59 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'courses.code' in 'where clause'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%introduction%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50')
+ 2 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%introduction%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE :courses.title: ESCAPE \'!\'
+OR  `courses`.`description` LIKE :courses.description: ESCAPE \'!\'
+OR  `courses`.`code` LIKE :courses.code: ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50', [...], false)
+ 4 APPPATH\Controllers\Course.php(140): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Course->search()
+ 6 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Course))
+ 7 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(38): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-11-27 16:00:59 --> [Caused by] mysqli_sql_exception: Unknown column 'courses.code' in 'where clause'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%introduction%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%introduction%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50')
+ 3 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%introduction%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE :courses.title: ESCAPE \'!\'
+OR  `courses`.`description` LIKE :courses.description: ESCAPE \'!\'
+OR  `courses`.`code` LIKE :courses.code: ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50', [...], false)
+ 5 APPPATH\Controllers\Course.php(140): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Course->search()
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Course))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(38): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2025-11-27 16:00:59 --> mysqli_sql_exception: Unknown column 'courses.code' in 'where clause' in C:\xampp\htdocs\ITE311-DORAIDO\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\MySQLi\Connection.php(327): mysqli->query('SELECT `courses...', 0)
+#1 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `courses...')
+#2 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `courses...')
+#3 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `courses...', Array, false)
+#4 C:\xampp\htdocs\ITE311-DORAIDO\app\Controllers\Course.php(140): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\xampp\htdocs\ITE311-DORAIDO\system\CodeIgniter.php(933): App\Controllers\Course->search()
+#6 C:\xampp\htdocs\ITE311-DORAIDO\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Course))
+#7 C:\xampp\htdocs\ITE311-DORAIDO\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#8 C:\xampp\htdocs\ITE311-DORAIDO\system\Boot.php(363): CodeIgniter\CodeIgniter->run()
+#9 C:\xampp\htdocs\ITE311-DORAIDO\system\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#10 C:\xampp\htdocs\ITE311-DORAIDO\index.php(38): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#11 {main}
+CRITICAL - 2025-11-27 16:00:59 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'courses.code' in 'where clause'
+[Method: GET, Route: courses/search]
+in SYSTEMPATH\Database\BaseConnection.php on line 684.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE :courses.title: ESCAPE \'!\'
+OR  `courses`.`description` LIKE :courses.description: ESCAPE \'!\'
+OR  `courses`.`code` LIKE :courses.code: ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50', [...], false)
+ 2 APPPATH\Controllers\Course.php(140): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Course->search()
+ 4 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Course))
+ 5 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 7 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 8 FCPATH\index.php(38): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-11-27 16:00:59 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'courses.code' in 'where clause'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%introduction%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50')
+ 2 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%introduction%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE :courses.title: ESCAPE \'!\'
+OR  `courses`.`description` LIKE :courses.description: ESCAPE \'!\'
+OR  `courses`.`code` LIKE :courses.code: ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50', [...], false)
+ 4 APPPATH\Controllers\Course.php(140): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Course->search()
+ 6 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Course))
+ 7 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(38): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-11-27 16:00:59 --> [Caused by] mysqli_sql_exception: Unknown column 'courses.code' in 'where clause'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%introduction%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%introduction%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50')
+ 3 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%introduction%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE :courses.title: ESCAPE \'!\'
+OR  `courses`.`description` LIKE :courses.description: ESCAPE \'!\'
+OR  `courses`.`code` LIKE :courses.code: ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50', [...], false)
+ 5 APPPATH\Controllers\Course.php(140): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Course->search()
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Course))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(38): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2025-11-27 16:01:17 --> mysqli_sql_exception: Unknown column 'courses.code' in 'where clause' in C:\xampp\htdocs\ITE311-DORAIDO\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\MySQLi\Connection.php(327): mysqli->query('SELECT `courses...', 0)
+#1 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `courses...')
+#2 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `courses...')
+#3 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `courses...', Array, false)
+#4 C:\xampp\htdocs\ITE311-DORAIDO\app\Controllers\Course.php(140): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\xampp\htdocs\ITE311-DORAIDO\system\CodeIgniter.php(933): App\Controllers\Course->search()
+#6 C:\xampp\htdocs\ITE311-DORAIDO\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Course))
+#7 C:\xampp\htdocs\ITE311-DORAIDO\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#8 C:\xampp\htdocs\ITE311-DORAIDO\system\Boot.php(363): CodeIgniter\CodeIgniter->run()
+#9 C:\xampp\htdocs\ITE311-DORAIDO\system\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#10 C:\xampp\htdocs\ITE311-DORAIDO\index.php(38): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#11 {main}
+CRITICAL - 2025-11-27 16:01:17 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'courses.code' in 'where clause'
+[Method: GET, Route: courses/search]
+in SYSTEMPATH\Database\BaseConnection.php on line 684.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE :courses.title: ESCAPE \'!\'
+OR  `courses`.`description` LIKE :courses.description: ESCAPE \'!\'
+OR  `courses`.`code` LIKE :courses.code: ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50', [...], false)
+ 2 APPPATH\Controllers\Course.php(140): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Course->search()
+ 4 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Course))
+ 5 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 7 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 8 FCPATH\index.php(38): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-11-27 16:01:17 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'courses.code' in 'where clause'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%introduction%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50')
+ 2 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%introduction%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE :courses.title: ESCAPE \'!\'
+OR  `courses`.`description` LIKE :courses.description: ESCAPE \'!\'
+OR  `courses`.`code` LIKE :courses.code: ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50', [...], false)
+ 4 APPPATH\Controllers\Course.php(140): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Course->search()
+ 6 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Course))
+ 7 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(38): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-11-27 16:01:17 --> [Caused by] mysqli_sql_exception: Unknown column 'courses.code' in 'where clause'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%introduction%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%introduction%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50')
+ 3 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%introduction%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE :courses.title: ESCAPE \'!\'
+OR  `courses`.`description` LIKE :courses.description: ESCAPE \'!\'
+OR  `courses`.`code` LIKE :courses.code: ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50', [...], false)
+ 5 APPPATH\Controllers\Course.php(140): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Course->search()
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Course))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(38): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2025-11-27 16:01:27 --> mysqli_sql_exception: Unknown column 'courses.code' in 'where clause' in C:\xampp\htdocs\ITE311-DORAIDO\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\MySQLi\Connection.php(327): mysqli->query('SELECT `courses...', 0)
+#1 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `courses...')
+#2 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `courses...')
+#3 C:\xampp\htdocs\ITE311-DORAIDO\system\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `courses...', Array, false)
+#4 C:\xampp\htdocs\ITE311-DORAIDO\app\Controllers\Course.php(140): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\xampp\htdocs\ITE311-DORAIDO\system\CodeIgniter.php(933): App\Controllers\Course->search()
+#6 C:\xampp\htdocs\ITE311-DORAIDO\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Course))
+#7 C:\xampp\htdocs\ITE311-DORAIDO\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#8 C:\xampp\htdocs\ITE311-DORAIDO\system\Boot.php(363): CodeIgniter\CodeIgniter->run()
+#9 C:\xampp\htdocs\ITE311-DORAIDO\system\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#10 C:\xampp\htdocs\ITE311-DORAIDO\index.php(38): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#11 {main}
+CRITICAL - 2025-11-27 16:01:27 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'courses.code' in 'where clause'
+[Method: GET, Route: courses/search]
+in SYSTEMPATH\Database\BaseConnection.php on line 684.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE :courses.title: ESCAPE \'!\'
+OR  `courses`.`description` LIKE :courses.description: ESCAPE \'!\'
+OR  `courses`.`code` LIKE :courses.code: ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50', [...], false)
+ 2 APPPATH\Controllers\Course.php(140): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Course->search()
+ 4 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Course))
+ 5 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 7 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 8 FCPATH\index.php(38): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-11-27 16:01:27 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'courses.code' in 'where clause'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%introduction%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50')
+ 2 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%introduction%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE :courses.title: ESCAPE \'!\'
+OR  `courses`.`description` LIKE :courses.description: ESCAPE \'!\'
+OR  `courses`.`code` LIKE :courses.code: ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50', [...], false)
+ 4 APPPATH\Controllers\Course.php(140): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Course->search()
+ 6 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Course))
+ 7 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(38): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-11-27 16:01:27 --> [Caused by] mysqli_sql_exception: Unknown column 'courses.code' in 'where clause'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%introduction%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%introduction%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50')
+ 3 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`description` LIKE \'%introduction%\' ESCAPE \'!\'
+OR  `courses`.`code` LIKE \'%introduction%\' ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `courses`.*, `users`.`name` as `teacher_name`
+FROM `courses`
+LEFT JOIN `users` ON `users`.`id` = `courses`.`teacher_id`
+WHERE   (
+`courses`.`title` LIKE :courses.title: ESCAPE \'!\'
+OR  `courses`.`description` LIKE :courses.description: ESCAPE \'!\'
+OR  `courses`.`code` LIKE :courses.code: ESCAPE \'!\'
+ )
+ORDER BY `courses`.`created_at` DESC
+ LIMIT 50', [...], false)
+ 5 APPPATH\Controllers\Course.php(140): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Course->search()
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Course))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(38): CodeIgniter\Boot::bootWeb(Object(Config\Paths))

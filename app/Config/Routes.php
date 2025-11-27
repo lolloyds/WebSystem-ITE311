@@ -23,6 +23,9 @@ $routes->post('/settings/updateProfile', 'Settings::updateProfile');
 $routes->post('/settings/changePassword', 'Settings::changePassword');
 
 // course routes
+$routes->get('/courses', 'Course::index');
+$routes->get('/courses/search', 'Course::search');
+$routes->post('/courses/search', 'Course::search');
 $routes->post('/course/enroll', 'Course::enroll');
 $routes->get('/course/view/(:num)', 'Course::view/$1');
 
