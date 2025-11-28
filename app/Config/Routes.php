@@ -27,6 +27,8 @@ $routes->get('/courses', 'Course::index');
 $routes->get('/courses/search', 'Course::search');
 $routes->post('/courses/search', 'Course::search');
 $routes->post('/course/enroll', 'Course::enroll');
+$routes->get('/course/enrolled', 'Course::getEnrolledCourses');
+$routes->get('/course/enrolled/search', 'Course::getEnrolledCourses');
 $routes->get('/course/view/(:num)', 'Course::view/$1');
 
 // announcements route

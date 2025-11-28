@@ -164,4 +164,55 @@ class Course extends BaseController
         $data['course'] = $course;
         return view('course/view', $data);
     }
+
+    /**
+     * Get enrolled courses for the authenticated user via AJAX
+     *
+     * @return \CodeIgniter\HTTP\ResponseInterface
+     */
+    public function getEnrolledCourses()
+    {
+        // Check if user is logged in
+        $session = session();
+        if (!$session->get('isAuthenticated')) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'You must be logged in to view enrolled courses.'
+            ]);
+        }
+
+        // Get user ID from session
+        $user_id = $session->get('userId');
+
+        // Get search term
+        $searchTerm = $this->request->getGet('q') ?? '';
+
+        // Get enrolled courses
+        $enrolledCourses = $this->enrollmentModel->getUserEnrollments($user_id);
+
+        // Add teacher name to each course and filter by search term
+        $db = \Config\Database::connect();
+        $filteredCourses = [];
+        foreach ($enrolledCourses as $course) {
+            $teacher = $db->table('courses')
+                         ->select('users.name')
+                         ->join('users', 'users.id = courses.teacher_id')
+                         ->where('courses.id', $course['course_id'])
+                         ->get()
+                         ->getRowArray();
+            $course['teacher_name'] = $teacher ? $teacher['name'] : 'Unknown';
+
+            // Apply search filter
+            if (empty($searchTerm) ||
+                stripos($course['title'], $searchTerm) !== false ||
+                stripos($course['description'], $searchTerm) !== false) {
+                $filteredCourses[] = $course;
+            }
+        }
+
+        return $this->response->setJSON([
+            'success' => true,
+            'courses' => $filteredCourses
+        ]);
+    }
 }
