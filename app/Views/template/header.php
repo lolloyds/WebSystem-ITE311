@@ -36,6 +36,9 @@
               <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#preferencesModal">
                 <i class="bi bi-sliders me-2"></i>Preferences
               </a></li>
+              <li class="nav-item">
+            <a class="nav-link" href="<?= base_url('courses') ?>">Courses</a>
+          </li>
               <?php $role = (string) session()->get('userRole'); ?>
               <?php if ($role === 'admin'): ?>
               <li><hr class="dropdown-divider"></li>
