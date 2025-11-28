@@ -322,6 +322,10 @@
                     
                     // Add to enrolled courses list
                     addToEnrolledCourses(courseId, courseTitle, response.enrollment_id);
+                    // Immediately refresh notifications (real-time UX)
+                    if (typeof window.fetchNotifications === 'function') {
+                        window.fetchNotifications();
+                    }
                     
                 } else {
                     // Show error message

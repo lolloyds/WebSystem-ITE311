@@ -139,6 +139,8 @@
           console.error('Failed to fetch notifications');
         });
       }
+      // Expose fetchNotifications globally so other scripts can trigger an immediate refresh
+      window.fetchNotifications = fetchNotifications;
 
       // Update notification badge
       function updateNotificationBadge(count) {
@@ -167,7 +169,7 @@
               '<div class="alert ' + alertClass + ' mb-1 notification-item" style="' + badgeStyle + '">' +
                 '<div class="d-flex justify-content-between align-items-start">' +
                   '<div class="flex-grow-1">' +
-                    '<small class="text-muted">' + formatDate(notification.created_at) + '</small><br>' +
+                          '<small class="text-muted">' + formatDate(notification.created_at_ts || notification.created_at_iso || notification.created_at) + '</small><br>' +
                     '<p class="mb-0">' + notification.message + '</p>' +
                   '</div>' +
                   (!isRead ? 
@@ -184,10 +186,24 @@
       }
 
       // Format date for display
-      function formatDate(dateString) {
-        var date = new Date(dateString);
+      function formatDate(dateOrTs) {
+        var date;
+        // If a number is provided, treat it as epoch ms
+        if (typeof dateOrTs === 'number') {
+          date = new Date(dateOrTs);
+        } else if (typeof dateOrTs === 'string' && dateOrTs.match(/^\d+$/)) {
+          // numeric string
+          date = new Date(parseInt(dateOrTs, 10));
+        } else {
+          date = new Date(dateOrTs);
+        }
+
+        if (isNaN(date.getTime())) {
+          return '';
+        }
+
         var now = new Date();
-        var diffMs = now - date;
+        var diffMs = now.getTime() - date.getTime();
         var diffMins = Math.floor(diffMs / 60000);
         var diffHours = Math.floor(diffMs / 3600000);
         var diffDays = Math.floor(diffMs / 86400000);

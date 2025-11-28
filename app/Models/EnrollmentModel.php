@@ -29,7 +29,9 @@ class EnrollmentModel extends Model
     {
         // Set enrolled_at timestamp if not provided
         if (!isset($data['enrolled_at'])) {
-            $data['enrolled_at'] = date('Y-m-d H:i:s');
+            $timezone = config('App')->appTimezone ?? 'UTC';
+            $dt = new \DateTime('now', new \DateTimeZone($timezone));
+            $data['enrolled_at'] = $dt->format(\DateTime::ATOM);
         }
 
         return $this->insert($data);

@@ -42,6 +42,26 @@ class Notifications extends BaseController
         // Get notifications (limit to 5 latest)
         $notifications = $this->notificationModel->getNotificationsForUser($userId, 5);
 
+        // Normalize timestamps: provide ISO and epoch-ms to avoid client-side parsing issues
+        foreach ($notifications as &$n) {
+            $created = $n['created_at'] ?? null;
+            if ($created) {
+                try {
+                    $dt = new \DateTime($created);
+                    $n['created_at_iso'] = $dt->format(\DateTime::ATOM);
+                    // milliseconds for JS
+                    $n['created_at_ts'] = (int) $dt->getTimestamp() * 1000;
+                } catch (\Exception $e) {
+                    // Fallback: keep original and set ts to null
+                    $n['created_at_iso'] = $created;
+                    $n['created_at_ts'] = null;
+                }
+            } else {
+                $n['created_at_iso'] = null;
+                $n['created_at_ts'] = null;
+            }
+        }
+
         return $this->response->setJSON([
             'success' => true,
             'count' => $unreadCount,

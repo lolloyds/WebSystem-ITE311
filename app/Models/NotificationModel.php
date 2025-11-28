@@ -85,7 +85,9 @@ class NotificationModel extends Model
     {
         // Set created_at timestamp if not provided
         if (!isset($data['created_at'])) {
-            $data['created_at'] = date('Y-m-d H:i:s');
+            $timezone = config('App')->appTimezone ?? 'UTC';
+            $dt = new \DateTime('now', new \DateTimeZone($timezone));
+            $data['created_at'] = $dt->format(\DateTime::ATOM);
         }
 
         // Ensure is_read is set to 0 by default

@@ -4,5 +4,5 @@
 
 <?= $this->section('content')?>
 <h1>Contact</h1>
-<p>he ContacTt page.</p>
+<p>The Contact page.</p>
 <?= $this->endSection()?>

@@ -59,7 +59,7 @@ class Course extends BaseController
         $enrollmentData = [
             'user_id' => $user_id,
             'course_id' => $course_id,
-            'enrolled_at' => date('Y-m-d H:i:s')
+            'enrolled_at' => (new \DateTime('now', new \DateTimeZone(config('App')->appTimezone ?? 'UTC')))->format(\DateTime::ATOM)
         ];
 
         // Insert enrollment record
@@ -78,7 +78,7 @@ class Course extends BaseController
                     'user_id' => $user_id,
                     'message' => 'You have been enrolled in ' . $course['title'],
                     'is_read' => 0,
-                    'created_at' => date('Y-m-d H:i:s')
+                    'created_at' => (new \DateTime('now', new \DateTimeZone(config('App')->appTimezone ?? 'UTC')))->format(\DateTime::ATOM)
                 ];
                 $this->notificationModel->createNotification($notificationData);
             }

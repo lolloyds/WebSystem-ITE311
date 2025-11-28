@@ -319,6 +319,10 @@ $(document).ready(function() {
 
                 // Show success message (simple implementation)
                 alert('Successfully enrolled in "' + courseTitle + '"!');
+                // Immediately refresh notifications (real-time UX)
+                if (typeof window.fetchNotifications === 'function') {
+                    window.fetchNotifications();
+                }
             } else {
                 alert(response.message || 'Failed to enroll in the course.');
                 button.prop('disabled', false);
