@@ -66,6 +66,13 @@
           <li class="nav-item">
             <a class="nav-link" href="<?= base_url('contact') ?>">Contact</a>
           </li>
+          <?php if (session()->get('isAuthenticated')): ?>
+          <li class="nav-item">
+            <a class="nav-link" href="<?= base_url('courses') ?>">
+              <i class=""></i> Courses
+            </a>
+          </li>
+          <?php endif; ?>
           
 
           <?php if (session()->get('isAuthenticated')): ?>
