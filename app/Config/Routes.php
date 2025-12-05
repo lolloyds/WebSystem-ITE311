@@ -53,3 +53,10 @@ $routes->get('materials/download/(:num)', 'Materials::download/$1');
 // Notifications routes
 $routes->get('notifications', 'Notifications::get');
 $routes->post('notifications/mark_read/(:num)', 'Notifications::markAsRead/$1');
+
+// Manage Users routes (admin only)
+$routes->get('manage-users', 'ManageUsers::index');
+$routes->post('manage-users/add', 'ManageUsers::addUser');
+$routes->post('manage-users/update-role', 'ManageUsers::updateRole');
+$routes->post('manage-users/toggle-status', 'ManageUsers::toggleStatus');
+$routes->post('manage-users/change-password', 'ManageUsers::changePassword');

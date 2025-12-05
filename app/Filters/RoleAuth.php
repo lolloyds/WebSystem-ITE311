@@ -31,6 +31,26 @@ class RoleAuth implements FilterInterface
             return redirect()->to('/login');
         }
 
+        // Check if user account is still active
+        $userId = session()->get('userId');
+        if ($userId) {
+            $userModel = new \App\Models\UserModel();
+            $userRecord = $userModel->find($userId);
+            
+            if (!$userRecord) {
+                session()->destroy();
+                session()->setFlashdata('error', 'User account not found.');
+                return redirect()->to('/login');
+            }
+            
+            $userStatus = $userRecord['status'] ?? 'active';
+            if ($userStatus !== 'active') {
+                session()->destroy();
+                session()->setFlashdata('error', 'Your account has been deactivated. Please contact an administrator.');
+                return redirect()->to('/login');
+            }
+        }
+
         // Get user role and current URI
         $userRole = session()->get('userRole');
         $currentURI = $request->getUri()->getPath();

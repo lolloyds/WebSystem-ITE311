@@ -33,6 +33,15 @@ class Course extends BaseController
             ]);
         }
 
+        // Only students can enroll in courses
+        $userRole = $session->get('userRole');
+        if ($userRole !== 'student') {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Only students can enroll in courses.'
+            ]);
+        }
+
         // Get user ID from session
         $user_id = $session->get('userId');
         

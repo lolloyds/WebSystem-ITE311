@@ -16,6 +16,7 @@ class UserModel extends Model
         'email',
         'password',
         'role',
+        'status',
         'created_at',
         'updated_at',
     ];

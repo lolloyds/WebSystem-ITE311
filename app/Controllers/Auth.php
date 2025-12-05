@@ -42,6 +42,13 @@ class Auth extends BaseController
                 return view('login');
             }
 
+            // Check if user account is active
+            $userStatus = $userRecord['status'] ?? 'active';
+            if ($userStatus !== 'active') {
+                session()->setFlashdata('login_error', 'Your account has been deactivated. Please contact an administrator.');
+                return view('login');
+            }
+
             // Store user session data
             $userSession = [
                 'userId' => $userRecord['id'],
@@ -149,8 +156,25 @@ class Auth extends BaseController
             return redirect()->to('/login');
         }
 
-        $role = (string) session()->get('userRole');
+        // Check if user account is still active
         $userId = (int) session()->get('userId');
+        $userModel = new \App\Models\UserModel();
+        $userRecord = $userModel->find($userId);
+        
+        if (!$userRecord) {
+            session()->destroy();
+            session()->setFlashdata('error', 'User account not found.');
+            return redirect()->to('/login');
+        }
+        
+        $userStatus = $userRecord['status'] ?? 'active';
+        if ($userStatus !== 'active') {
+            session()->destroy();
+            session()->setFlashdata('error', 'Your account has been deactivated. Please contact an administrator.');
+            return redirect()->to('/login');
+        }
+
+        $role = (string) session()->get('userRole');
 
         $data = [
             'role' => $role,
@@ -163,11 +187,6 @@ class Auth extends BaseController
 
             if ($role === 'admin') {
                 $data['totalUsers'] = (int) $db->table('users')->countAllResults();
-                if ($db->tableExists('courses')) {
-                    $data['totalCourses'] = (int) $db->table('courses')->countAllResults();
-                } else {
-                    $data['totalCourses'] = 0;
-                }
                 $data['recentUsers'] = $db->table('users')
                     ->select('id, name, email, role, created_at')
                     ->orderBy('id', 'DESC')
