@@ -68,8 +68,10 @@ class Auth extends BaseController
             $userRole = (string) $userRecord['role'];
             if ($userRole === 'student') {
                 return redirect()->to('/announcements');
+            } elseif ($userRole === 'admin') {
+                return redirect()->to('/admin/dashboard');
             } else {
-                // Admins and teachers go to dashboard
+                // Teachers go to dashboard
                 return redirect()->to('/dashboard');
             }
         }
@@ -213,4 +215,4 @@ class Auth extends BaseController
         return view('auth/dashboard', $data);
     }
     
-}   
+}

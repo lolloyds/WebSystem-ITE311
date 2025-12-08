@@ -8,12 +8,13 @@ class UserSeeder extends Seeder
 {
     public function run()
     {
-        $data = [
+        $users = [
             [
                 'name' => 'Admin User',
                 'email' => 'admin@example.com',
                 'password' => password_hash('admin123', PASSWORD_DEFAULT),
                 'role' => 'admin',
+                'status' => 'active',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
@@ -22,6 +23,7 @@ class UserSeeder extends Seeder
                 'email' => 'student@example.com',
                 'password' => password_hash('student123', PASSWORD_DEFAULT),
                 'role' => 'student',
+                'status' => 'active',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
@@ -30,6 +32,7 @@ class UserSeeder extends Seeder
                 'email' => 'teacher@example.com',
                 'password' => password_hash('teacher123', PASSWORD_DEFAULT),
                 'role' => 'teacher',
+                'status' => 'active',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
@@ -38,12 +41,13 @@ class UserSeeder extends Seeder
                 'email' => 'johndoraido@example.com',
                 'password' => password_hash('John123', PASSWORD_DEFAULT),
                 'role' => 'student',
+                'status' => 'active',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
-            // Additional students for realistic dat
         ];
 
-        $this->db->table('users')->insertBatch($data);
+        // Use upsert to handle existing records
+        $this->db->table('users')->upsertBatch($users, 'email');
     }
 }

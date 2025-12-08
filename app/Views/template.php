@@ -67,11 +67,14 @@
             <a class="nav-link" href="<?= base_url('contact') ?>">Contact</a>
           </li>
           <?php if (session()->get('isAuthenticated')): ?>
-          <li class="nav-item">
-            <a class="nav-link" href="<?= base_url('courses') ?>">
-              <i class=""></i> Courses
-            </a>
-          </li>
+            <?php $role = (string) session()->get('userRole'); ?>
+            <?php if ($role !== 'admin'): ?>
+            <li class="nav-item">
+              <a class="nav-link" href="<?= base_url('courses') ?>">
+                <i class=""></i> Courses
+              </a>
+            </li>
+            <?php endif; ?>
           <?php endif; ?>
           
 
@@ -101,7 +104,7 @@
 
           <?php if (session()->get('isAuthenticated')): ?>
             <?php $role = (string) session()->get('userRole'); ?>
-            <?php if ($role === 'admin'): ?>
+            <?php if ($role === 'admin' && uri_string() !== 'manage-users'): ?>
               <li class="nav-item">
                 <a class="nav-link" href="<?= base_url('admin/dashboard') ?>">Admin</a>
               </li>

@@ -23,17 +23,25 @@
     .table thead th {
         vertical-align: middle !important;
     }
-    .table tbody td[class*="status"],
-    .table tbody td:has(.badge) {
+    .status-column {
+        text-align: center !important;
         vertical-align: middle !important;
+        padding: 12px 8px !important;
     }
-    .table tbody td .badge {
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        vertical-align: middle !important;
-        margin: 0 auto !important;
+    .status-column .badge {
+        display: inline-block !important;
+        position: static !important;
+        padding: 6px 12px !important;
+        font-size: 0.875rem !important;
+        font-weight: 500 !important;
+        border-radius: 20px !important;
+        white-space: nowrap !important;
+        min-width: 80px !important;
     }
+    .table-responsive {
+        border-radius: 0.375rem;
+    }
+    a[href*='admin/dashboard'] { display: none !important; }
 </style>
 
 <!-- Users Table -->
@@ -50,7 +58,7 @@
                         <th style="width: 18%;" class="align-middle"><i class="bi bi-person me-1"></i> Full Name</th>
                         <th style="width: 22%;" class="align-middle"><i class="bi bi-envelope me-1"></i> Email/Username</th>
                         <th style="width: 12%;" class="align-middle"><i class="bi bi-shield-lock me-1"></i> Role</th>
-                        <th style="width: 10%;" class="align-middle text-center"><i class="bi bi-toggle-on me-1"></i> Status</th>
+                        <th style="width: 10%;" class="align-middle text-center">Status</th>
                         <th style="width: 18%;" class="align-middle"><i class="bi bi-calendar me-1"></i> Created</th>
                         <th style="width: 15%;" class="text-center align-middle"><i class="bi bi-gear me-1"></i> Actions</th>
                     </tr>
@@ -104,18 +112,16 @@
                                         </select>
                                     <?php endif; ?>
                                 </td>
-                                <td class="align-middle text-center" style="vertical-align: middle !important; height: 100%;">
-                                    <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
-                                        <?php 
-                                        $userStatus = $user['status'] ?? 'active';
-                                        $statusBadgeClass = ($userStatus === 'active') ? 'bg-success' : 'bg-secondary';
-                                        $statusText = ucfirst($userStatus);
-                                        ?>
-                                        <span class="badge <?= $statusBadgeClass ?>" id="status-badge-<?= $user['id'] ?>" style="display: inline-flex; align-items: center; justify-content: center;">
-                                            <i class="bi bi-<?= $userStatus === 'active' ? 'check-circle' : 'x-circle' ?> me-1"></i>
-                                            <?= esc($statusText) ?>
-                                        </span>
-                                    </div>
+                                <td class="status-column">
+                                    <?php
+                                    $userStatus = $user['status'] ?? 'active';
+                                    $statusValue = ($userStatus === 'active' || $userStatus == 1) ? 1 : 0;
+                                    $statusBadgeClass = ($statusValue == 1) ? 'bg-success' : 'bg-danger';
+                                    $statusText = ($statusValue == 1) ? 'Active' : 'Inactive';
+                                    ?>
+                                    <span class="badge <?= $statusBadgeClass ?>" id="status-badge-<?= $user['id'] ?>">
+                                        <?= esc($statusText) ?>
+                                    </span>
                                 </td>
                                 <td class="align-middle">
                                     <small class="text-muted">
@@ -443,16 +449,14 @@ $(document).ready(function() {
                         // Update status badge
                         const newStatus = response.new_status;
                         const $badge = $('#status-badge-' + userId);
-                        const newBadgeClass = newStatus === 'active' ? 'bg-success' : 'bg-secondary';
-                        const newStatusText = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
-                        const newIcon = newStatus === 'active' ? 'check-circle' : 'x-circle';
-                        
-                        $badge.removeClass('bg-success bg-secondary')
+                        const statusValue = (newStatus === 'active' || newStatus == 1) ? 1 : 0;
+                        const newBadgeClass = (statusValue == 1) ? 'bg-success' : 'bg-danger';
+                        const newStatusText = (statusValue == 1) ? 'Active' : 'Inactive';
+                        const newIcon = (statusValue == 1) ? 'check-circle' : 'x-circle';
+
+                        $badge.removeClass('bg-success bg-danger')
                                .addClass(newBadgeClass)
-                               .html('<i class="bi bi-' + newIcon + ' me-1"></i>' + newStatusText)
-                               .css('display', 'inline-flex')
-                               .css('align-items', 'center')
-                               .css('justify-content', 'center');
+                               .html(newStatusText);
                         
                         // Update button
                         const newBtnClass = newStatus === 'active' ? 'btn-outline-warning' : 'btn-outline-success';
@@ -496,4 +500,3 @@ $(document).ready(function() {
 </script>
 
 <?= $this->endSection() ?>
-
