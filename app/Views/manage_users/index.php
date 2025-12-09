@@ -98,9 +98,7 @@
                                 <td class="align-middle">
                                     <?php if ($isProtected): ?>
                                         <!-- Protected admin - show role but disable dropdown -->
-                                        <span class="badge <?= $roleBadgeClass ?>">
-                                            <?= ucfirst(esc($user['role'])) ?>
-                                        </span>
+                                        <?= ucfirst(esc($user['role'])) ?>
                                     <?php else: ?>
                                         <!-- Regular user - editable role dropdown -->
                                         <select class="form-select form-select-sm role-select" 
