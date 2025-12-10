@@ -290,6 +290,143 @@ class ManageUsers extends BaseController
         }
     }
 
+    public function editUser()
+    {
+        // Verify authentication and admin role
+        if (!session()->get('isAuthenticated') || session()->get('userRole') !== 'admin') {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Access denied: Insufficient permissions.'
+            ]);
+        }
+
+        if ($this->request->getMethod() !== 'POST') {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Invalid request method.'
+            ]);
+        }
+
+        // Get and sanitize input
+        $userId = (int) $this->request->getPost('user_id');
+        $name = trim((string) $this->request->getPost('name'));
+        $email = trim((string) $this->request->getPost('email'));
+        $password = (string) $this->request->getPost('password'); // Optional
+
+        // Validate required fields
+        if (empty($userId) || empty($name) || empty($email)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'User ID, name, and email are required.'
+            ]);
+        }
+
+        // Prevent editing protected admin
+        if ($userId === $this->protectedAdminId) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Cannot edit the protected admin account.'
+            ]);
+        }
+
+        // Validate name format (only letters, spaces, hyphens, apostrophes)
+        if (!preg_match('/^[a-zA-Z\s\-\']+$/', $name)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Name can only contain letters, spaces, hyphens, and apostrophes.'
+            ]);
+        }
+
+        // Validate email format
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Please enter a valid email address.'
+            ]);
+        }
+
+        // Check if user exists
+        $user = $this->userModel->find($userId);
+        if (!$user) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'User not found.'
+            ]);
+        }
+
+        // Check for duplicate email (only if email is different)
+        if ($email !== $user['email']) {
+            $existingUser = $this->userModel->where('email', $email)->first();
+            if ($existingUser) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'This email is already in use by another account.'
+                ]);
+            }
+        }
+
+        // Prepare update data
+        $updateData = [
+            'name' => $name,
+            'email' => $email,
+            'updated_at' => date('Y-m-d H:i:s'),
+        ];
+
+        // Add password if provided
+        if (!empty($password)) {
+            // Validate password strength
+            if (strlen($password) < 8) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Password must be at least 8 characters long.'
+                ]);
+            }
+
+            if (!preg_match('/[A-Za-z]/', $password) || !preg_match('/[0-9]/', $password)) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Password must contain at least one letter and one number.'
+                ]);
+            }
+
+            // Hash password securely
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+            $updateData['password'] = $hashedPassword;
+        }
+
+        // Update user
+        if ($this->userModel->update($userId, $updateData)) {
+            // Check if user changed their own password - force logout
+            $currentUserId = session()->get('userId');
+            $passwordChanged = !empty($password);
+
+            if ($passwordChanged && $userId == $currentUserId) {
+                // Destroy session and redirect to login
+                session()->destroy();
+                return $this->response->setJSON([
+                    'success' => true,
+                    'message' => 'Password updated successfully. You have been logged out for security.',
+                    'force_logout' => true
+                ]);
+            }
+
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'User details updated successfully.',
+                'user' => [
+                    'id' => $userId,
+                    'name' => $name,
+                    'email' => $email
+                ]
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Failed to update user details. Please try again.'
+            ]);
+        }
+    }
+
     public function changePassword()
     {
         // Verify authentication and admin role
@@ -353,6 +490,18 @@ class ManageUsers extends BaseController
         ];
 
         if ($this->userModel->update($userId, $updateData)) {
+            // Check if user changed their own password - force logout
+            $currentUserId = session()->get('userId');
+            if ($userId == $currentUserId) {
+                // Destroy session and redirect to login
+                session()->destroy();
+                return $this->response->setJSON([
+                    'success' => true,
+                    'message' => 'Password updated successfully. You have been logged out for security.',
+                    'force_logout' => true
+                ]);
+            }
+
             return $this->response->setJSON([
                 'success' => true,
                 'message' => 'Password updated successfully.'

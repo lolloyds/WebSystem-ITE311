@@ -46,6 +46,7 @@ class CourseSeeder extends Seeder
 
         ];
 
-        $this->db->table('courses')->insertBatch($data);
+        // Use upsert to handle existing records
+        $this->db->table('courses')->upsertBatch($data, 'title');
     }
 }

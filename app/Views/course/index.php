@@ -98,7 +98,7 @@
                                                     </small>
                                                 </div>
                                             </div>
-                                            <?php if (session()->get('isAuthenticated')): ?>
+                                            <?php if (session()->get('isAuthenticated') && session()->get('userRole') === 'student'): ?>
                                             <div class="card-footer bg-transparent">
                                                 <div class="d-flex gap-2">
                                                     <button class="btn btn-success btn-sm enroll-btn flex-grow-1"
@@ -151,6 +151,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 var isAuthenticated = <?= session()->get('isAuthenticated') ? 'true' : 'false' ?>;
+var userRole = '<?= session()->get('userRole') ?>';
 </script>
 <script>
 $(document).ready(function() {
@@ -339,7 +340,7 @@ $(document).ready(function() {
                                 </small>
                             </div>
                         </div>
-                        ${isAuthenticated ? `
+                        ${(isAuthenticated && userRole === 'student') ? `
                         <div class="card-footer bg-transparent">
                             <div class="d-flex gap-2">
                                 <button class="btn btn-success btn-sm enroll-btn flex-grow-1"

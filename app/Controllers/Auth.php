@@ -70,8 +70,10 @@ class Auth extends BaseController
                 return redirect()->to('/announcements');
             } elseif ($userRole === 'admin') {
                 return redirect()->to('/admin/dashboard');
+            } elseif ($userRole === 'teacher') {
+                return redirect()->to('/teacher/dashboard');
             } else {
-                // Teachers go to dashboard
+                // Default to general dashboard
                 return redirect()->to('/dashboard');
             }
         }

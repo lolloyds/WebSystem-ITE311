@@ -128,9 +128,19 @@
                                 </td>
                                 <td class="text-center align-middle">
                                     <div class="btn-group btn-group-sm" role="group">
+                                        <!-- Edit User Button -->
+                                        <button type="button"
+                                                class="btn btn-outline-info edit-user-btn"
+                                                data-user-id="<?= $user['id'] ?>"
+                                                data-user-name="<?= esc($user['name']) ?>"
+                                                data-user-email="<?= esc($user['email']) ?>"
+                                                title="Edit User Details">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+
                                         <!-- Change Password Button -->
-                                        <button type="button" 
-                                                class="btn btn-outline-primary change-password-btn" 
+                                        <button type="button"
+                                                class="btn btn-outline-primary change-password-btn"
                                                 data-user-id="<?= $user['id'] ?>"
                                                 data-user-name="<?= esc($user['name']) ?>"
                                                 title="Change Password">
@@ -218,6 +228,45 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-check-circle me-1"></i> Create User
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="editUserModalLabel">
+                    <i class="bi bi-pencil me-2"></i> Edit User Details
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editUserForm">
+                <input type="hidden" id="editUserId" name="user_id">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="editUserName" class="form-label">Full Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="editUserName" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editUserEmail" class="form-label">Email/Username <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" id="editUserEmail" name="email" required>
+                        <div class="form-text">Must be a valid email address and unique.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editUserPassword" class="form-label">New Password (Optional)</label>
+                        <input type="password" class="form-control" id="editUserPassword" name="password" placeholder="Leave blank to keep current password">
+                        <div class="form-text">Minimum 8 characters, must contain at least one letter and one number.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-info">
+                        <i class="bi bi-check-circle me-1"></i> Update User
                     </button>
                 </div>
             </form>
@@ -371,20 +420,94 @@ $(document).ready(function() {
         });
     });
 
+    // Handle Edit User Button Click
+    $('.edit-user-btn').on('click', function() {
+        const userId = $(this).data('user-id');
+        const userName = $(this).data('user-name');
+        const userEmail = $(this).data('user-email');
+
+        $('#editUserId').val(userId);
+        $('#editUserName').val(userName);
+        $('#editUserEmail').val(userEmail);
+        $('#editUserPassword').val(''); // Clear password field
+        $('#editUserModal').modal('show');
+    });
+
     // Handle Change Password Button Click
     $('.change-password-btn').on('click', function() {
         const userId = $(this).data('user-id');
         const userName = $(this).data('user-name');
-        
+
         $('#changePasswordUserId').val(userId);
         $('#changePasswordUserName').text(userName);
         $('#changePasswordModal').modal('show');
     });
 
+    // Handle Edit User Form Submission
+    $('#editUserForm').on('submit', function(e) {
+        e.preventDefault();
+
+        const formData = {
+            user_id: $('#editUserId').val(),
+            name: $('#editUserName').val().trim(),
+            email: $('#editUserEmail').val().trim(),
+            password: $('#editUserPassword').val()
+        };
+
+        // Basic client-side validation
+        if (!formData.name || !formData.email) {
+            showAlert('danger', 'Please fill in name and email fields.');
+            return;
+        }
+
+        const submitBtn = $(this).find('button[type="submit"]');
+        const originalText = submitBtn.html();
+        submitBtn.prop('disabled', true).html('<i class="bi bi-hourglass-split me-1"></i> Updating...');
+
+        $.ajax({
+            url: '<?= base_url('manage-users/edit') ?>',
+            method: 'POST',
+            data: formData,
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    showAlert('success', response.message);
+                    $('#editUserModal').modal('hide');
+
+                    // Check if user was forced to logout (changed their own password)
+                    if (response.force_logout) {
+                        // Redirect to login page after a short delay
+                        setTimeout(function() {
+                            window.location.href = '<?= base_url('login') ?>';
+                        }, 2000);
+                        return;
+                    }
+
+                    // Update the table row with new data
+                    if (response.user) {
+                        const userId = response.user.id;
+                        $('#user-row-' + userId + ' td:nth-child(2)').contents().first().replaceWith(response.user.name);
+                        $('#user-row-' + userId + ' td:nth-child(3)').text(response.user.email);
+                        // Update button data attributes
+                        $('.edit-user-btn[data-user-id="' + userId + '"]').attr('data-user-name', response.user.name).attr('data-user-email', response.user.email);
+                    }
+                    $('#editUserForm')[0].reset();
+                } else {
+                    showAlert('danger', response.message);
+                }
+                submitBtn.prop('disabled', false).html(originalText);
+            },
+            error: function() {
+                showAlert('danger', 'An error occurred. Please try again.');
+                submitBtn.prop('disabled', false).html(originalText);
+            }
+        });
+    });
+
     // Handle Change Password Form Submission
     $('#changePasswordForm').on('submit', function(e) {
         e.preventDefault();
-        
+
         const formData = {
             user_id: $('#changePasswordUserId').val(),
             password: $('#newPassword').val()
@@ -408,6 +531,16 @@ $(document).ready(function() {
                 if (response.success) {
                     showAlert('success', response.message);
                     $('#changePasswordModal').modal('hide');
+
+                    // Check if user was forced to logout (changed their own password)
+                    if (response.force_logout) {
+                        // Redirect to login page after a short delay
+                        setTimeout(function() {
+                            window.location.href = '<?= base_url('login') ?>';
+                        }, 2000);
+                        return;
+                    }
+
                     $('#changePasswordForm')[0].reset();
                 } else {
                     showAlert('danger', response.message);
@@ -487,7 +620,7 @@ $(document).ready(function() {
     });
 
     // Reset modals when closed
-    $('#addUserModal, #changePasswordModal').on('hidden.bs.modal', function() {
+    $('#addUserModal, #changePasswordModal, #editUserModal').on('hidden.bs.modal', function() {
         $(this).find('form')[0].reset();
         // Restore default password for Add User modal
         if ($(this).attr('id') === 'addUserModal') {
