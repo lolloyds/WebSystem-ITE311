@@ -82,3 +82,6 @@ $routes->post('manage-users/toggle-status', 'ManageUsers::toggleStatus');
 $routes->post('manage-users/change-password', 'ManageUsers::changePassword');
 $routes->post('manage-users/edit', 'ManageUsers::editUser');
 $routes->get('manage-users/get-teachers', 'ManageUsers::getTeachers');
+
+// Debug route to check users
+$routes->get('debug/users', 'Admin::debugUsers');

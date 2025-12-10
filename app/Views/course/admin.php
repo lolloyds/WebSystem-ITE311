@@ -113,9 +113,10 @@
                                             <td><?= esc($course['schedule'] ?? 'N/A') ?></td>
                                             <td><?= esc($course['teacher_name'] ?? 'N/A') ?></td>
                                             <td>
-                                                <span class="badge bg-<?= ($course['status'] ?? 'active') === 'active' ? 'success' : 'secondary' ?>">
-                                                    <?= ucfirst($course['status'] ?? 'active') ?>
-                                                </span>
+                                                <select class="form-select form-select-sm status-dropdown" data-course-id="<?= $course['id'] ?>" style="width: auto;">
+                                                    <option value="active" <?= ($course['status'] ?? 'active') === 'active' ? 'selected' : '' ?>>Active</option>
+                                                    <option value="inactive" <?= ($course['status'] ?? 'inactive') === 'inactive' ? 'selected' : '' ?>>Inactive</option>
+                                                </select>
                                             </td>
                                             <td>
                                                 <button class="btn btn-sm btn-outline-primary edit-btn"
@@ -309,23 +310,28 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="schedule" class="form-label fw-bold">Schedule</label>
-                            <input type="text" class="form-control" id="schedule" name="schedule" placeholder="e.g., MWF 9:00-10:00 AM">
+                            <select class="form-select" id="schedule" name="schedule">
+                                <option value="">Select Schedule</option>
+                                <option value="MWF 8:00-9:00 AM">MWF 8:00-9:00 AM</option>
+                                <option value="MWF 9:00-10:00 AM">MWF 9:00-10:00 AM</option>
+                                <option value="MWF 10:00-11:00 AM">MWF 10:00-11:00 AM</option>
+                                <option value="MWF 1:00-2:00 PM">MWF 1:00-2:00 PM</option>
+                                <option value="MWF 2:00-3:00 PM">MWF 2:00-3:00 PM</option>
+                                <option value="TTH 8:00-9:30 AM">TTH 8:00-9:30 AM</option>
+                                <option value="TTH 9:30-11:00 AM">TTH 9:30-11:00 AM</option>
+                                <option value="TTH 1:00-2:30 PM">TTH 1:00-2:30 PM</option>
+                                <option value="TTH 2:30-4:00 PM">TTH 2:30-4:00 PM</option>
+                                <option value="MW 6:00-9:00 PM">MW 6:00-9:00 PM</option>
+                                <option value="TH 6:00-9:00 PM">TH 6:00-9:00 PM</option>
+                            </select>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Status</label>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="status" id="status_active" value="active" checked>
-                            <label class="form-check-label" for="status_active">
-                                Active
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="status" id="status_inactive" value="inactive">
-                            <label class="form-check-label" for="status_inactive">
-                                Inactive
-                            </label>
-                        </div>
+                        <label for="status" class="form-label fw-bold">Status</label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -341,8 +347,14 @@
     </div>
 </div>
 
+<!-- Add jQuery if not loaded -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
+console.log('Course management JavaScript loaded successfully');
+
 $(document).ready(function() {
+    console.log('Document ready - course management initialized');
     // Load teachers for dropdown
     function loadTeachers() {
         $.get('<?= base_url('manage-users/get-teachers') ?>')
@@ -367,11 +379,16 @@ $(document).ready(function() {
         $searchBtn.prop('disabled', true).html('<i class="bi bi-hourglass me-1"></i>Searching...');
         $('#courses-tbody').html('<tr><td colspan="9" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Searching...</span></div><p class="mt-2 text-muted">Searching courses...</p></td></tr>');
 
+        console.log('Searching for:', searchTerm);
+        console.log('URL:', '<?= base_url('course/adminCourses') ?>');
+
         $.get('<?= base_url('course/adminCourses') ?>', { search: searchTerm })
             .done(function(data) {
-                renderCoursesTable(data, searchTerm);
+                console.log('Search response:', data);
+                renderCoursesTable(data.courses || [], searchTerm);
             })
-            .fail(function() {
+            .fail(function(xhr, status, error) {
+                console.error('Search failed:', xhr, status, error);
                 $('#courses-tbody').html('<tr><td colspan="9" class="text-center text-danger"><i class="bi bi-exclamation-triangle me-2"></i>Failed to search courses. Please try again.</td></tr>');
             })
             .always(function() {
@@ -379,9 +396,15 @@ $(document).ready(function() {
             });
     }
 
-    $('#search-btn').click(searchCourses);
+    $('#search-btn').click(function() {
+        alert('Search button clicked - debugging active');
+        console.log('Search button clicked');
+        searchCourses();
+    });
     $('#course-search').keypress(function(e) {
         if (e.which === 13) {
+            alert('Enter key pressed in search - debugging active');
+            console.log('Enter key pressed in search');
             searchCourses();
         }
     });
@@ -395,7 +418,6 @@ $(document).ready(function() {
 
         let html = '';
         courses.forEach(function(course) {
-            const statusBadge = course.status === 'active' ? 'bg-success' : 'bg-secondary';
             const description = course.description.length > 50 ? course.description.substring(0, 50) + '...' : course.description;
 
             html += `
@@ -407,7 +429,12 @@ $(document).ready(function() {
                     <td>${course.semester || 'N/A'}</td>
                     <td>${course.schedule || 'N/A'}</td>
                     <td>${course.teacher_name || 'N/A'}</td>
-                    <td><span class="badge ${statusBadge}">${course.status ? course.status.charAt(0).toUpperCase() + course.status.slice(1) : 'Active'}</span></td>
+                    <td>
+                        <select class="form-select form-select-sm status-dropdown" data-course-id="${course.id}" style="width: auto;">
+                            <option value="active" ${course.status === 'active' ? 'selected' : ''}>Active</option>
+                            <option value="inactive" ${course.status === 'inactive' ? 'selected' : ''}>Inactive</option>
+                        </select>
+                    </td>
                     <td>
                         <button class="btn btn-sm btn-outline-primary edit-btn" data-course-id="${course.id}" title="Edit Details">
                             <i class="bi bi-pencil"></i>
@@ -419,13 +446,44 @@ $(document).ready(function() {
         $('#courses-tbody').html(html);
     }
 
+    // Handle inline status changes
+    $(document).on('change', '.status-dropdown', function() {
+        const courseId = $(this).data('course-id');
+        const newStatus = $(this).val();
+
+        $.post('<?= base_url('course/update') ?>', {
+            course_id: courseId,
+            status: newStatus
+        })
+        .done(function(response) {
+            if (response.success) {
+                // Update the summary cards
+                location.reload();
+            } else {
+                alert('Error: ' + response.message);
+                // Revert the change
+                location.reload();
+            }
+        })
+        .fail(function() {
+            alert('Failed to update course status. Please try again.');
+            // Revert the change
+            location.reload();
+        });
+    });
+
     // Edit course modal
     $(document).on('click', '.edit-btn', function() {
         const courseId = $(this).data('course-id');
+        console.log('Edit button clicked for course ID:', courseId);
 
         // Load course details
-        $.get('<?= base_url('course/getCourse') ?>/' + courseId)
+        const editUrl = '<?= base_url('course/getCourse') ?>/' + courseId;
+        console.log('Loading course details from:', editUrl);
+
+        $.get(editUrl)
             .done(function(data) {
+                console.log('Edit response:', data);
                 if (data.error) {
                     alert('Error: ' + data.error);
                     return;
@@ -441,12 +499,13 @@ $(document).ready(function() {
                 $('#description').val(data.description);
                 $('#teacher_id').val(data.teacher_id);
                 $('#schedule').val(data.schedule);
-                $(`input[name="status"][value="${data.status}"]`).prop('checked', true);
+                $('#status').val(data.status);
 
                 loadTeachers();
                 $('#editCourseModal').modal('show');
             })
-            .fail(function() {
+            .fail(function(xhr, status, error) {
+                console.error('Edit failed:', xhr, status, error);
                 alert('Failed to load course details.');
             });
     });

@@ -14,6 +14,74 @@
         </div>
     </div>
 
+    <!-- Recent Users Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm" style="border-radius: 15px; border: none;">
+                <div class="card-header bg-white border-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title text-dark mb-0">
+                            <i class="bi bi-person-plus me-2 text-primary"></i>Recent Users
+                        </h5>
+                        <a href="<?= base_url('manage-users') ?>" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-arrow-right me-1"></i>View All
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <?php if (empty($recentUsers)): ?>
+                        <div class="text-center py-4">
+                            <i class="bi bi-people text-muted" style="font-size: 3rem;"></i>
+                            <p class="text-muted mt-2">No users registered yet</p>
+                        </div>
+                    <?php else: ?>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Registered</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($recentUsers as $user): ?>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
+                                                        <i class="bi bi-person text-primary"></i>
+                                                    </div>
+                                                    <span class="fw-medium"><?= esc($user['name']) ?></span>
+                                                </div>
+                                            </td>
+                                            <td class="text-muted"><?= esc($user['email']) ?></td>
+                                            <td>
+                                                <span class="badge bg-<?= $user['role'] === 'admin' ? 'danger' : ($user['role'] === 'teacher' ? 'success' : 'info') ?>">
+                                                    <?= ucfirst(esc($user['role'])) ?>
+                                                </span>
+                                            </td>
+                                            <td class="text-muted">
+                                                <small><?= date('M j, Y', strtotime($user['created_at'])) ?></small>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-<?= ($user['status'] ?? 'active') === 'active' ? 'success' : 'secondary' ?>">
+                                                    <?= ucfirst($user['status'] ?? 'active') ?>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Quick Actions -->
     <div class="row mb-4">
         <div class="col-12">
