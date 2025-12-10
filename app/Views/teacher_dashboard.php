@@ -66,11 +66,16 @@
                             <i class="bi bi-megaphone text-warning" style="font-size: 2rem;"></i>
                         </div>
                     </div>
-                    <h5 class="card-title fw-bold text-dark mb-3">Create Announcement</h5>
-                    <p class="card-text text-muted mb-4">Post important announcements for students.</p>
-                    <button class="btn btn-warning w-100" data-bs-toggle="modal" data-bs-target="#createAnnouncementModal">
-                        <i class="bi bi-plus-circle me-2"></i>Create Announcement
-                    </button>
+                    <h5 class="card-title fw-bold text-dark mb-3">Announcements</h5>
+                    <p class="card-text text-muted mb-4">Post and view important announcements for students.</p>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#createAnnouncementModal">
+                            <i class="bi bi-plus-circle me-2"></i>Create Announcement
+                        </button>
+                        <a href="<?= base_url('announcements') ?>" class="btn btn-outline-warning">
+                            <i class="bi bi-eye me-2"></i>View All Announcements
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
