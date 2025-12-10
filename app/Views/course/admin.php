@@ -486,24 +486,46 @@ $(document).ready(function() {
 
     // Load teachers for create modal
     function loadTeachersForCreate() {
+        // Show loading state
+        $('#create_teacher_id').html('<option value="">Loading teachers...</option>');
+
         $.get('<?= base_url('manage-users/get-teachers') ?>')
             .done(function(data) {
+                console.log('Teachers loaded for create modal:', data);
                 let options = '<option value="">Select Teacher</option>';
-                data.forEach(function(teacher) {
-                    options += `<option value="${teacher.id}">${teacher.name}</option>`;
-                });
+
+                // Check if response is an error
+                if (data && typeof data === 'object' && data.error) {
+                    console.error('Server returned error:', data.error);
+                    options += '<option value="" disabled>Error: ' + data.error + '</option>';
+                } else if (data && Array.isArray(data) && data.length > 0) {
+                    data.forEach(function(teacher) {
+                        if (teacher.id && teacher.name) {
+                            options += `<option value="${teacher.id}">${teacher.name}</option>`;
+                        }
+                    });
+                    if (options === '<option value="">Select Teacher</option>') {
+                        options += '<option value="" disabled>No valid teachers found</option>';
+                    }
+                } else {
+                    options += '<option value="" disabled>No teachers available</option>';
+                }
                 $('#create_teacher_id').html(options);
             })
-            .fail(function() {
-                console.error('Failed to load teachers for create modal');
+            .fail(function(xhr, status, error) {
+                console.error('Failed to load teachers for create modal:', status, error, xhr.responseText);
+                let options = '<option value="">Select Teacher</option>';
+                options += '<option value="" disabled>Failed to load teachers</option>';
+                $('#create_teacher_id').html(options);
             });
     }
 
-    // Create course modal
+    // Load teachers when create course modal is shown
     $('#createCourseModal').on('shown.bs.modal', function() {
-        loadTeachersForCreate();
         // Reset form
         $('#create-course-form')[0].reset();
+        // Load teachers
+        loadTeachersForCreate();
     });
 
     // Create course form submission

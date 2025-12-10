@@ -501,6 +501,11 @@ $(document).ready(function() {
                     loadEnrolledCourses();
                 }
 
+                // Refresh available courses to remove the enrolled course
+                if ($('#available').hasClass('active')) {
+                    location.reload();
+                }
+
                 // Immediately refresh notifications (real-time UX)
                 if (typeof window.fetchNotifications === 'function') {
                     window.fetchNotifications();

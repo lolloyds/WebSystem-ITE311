@@ -199,7 +199,7 @@ class Auth extends BaseController
 
                 // Student dashboard data
                 $data['enrolledCourses'] = $enrollmentModel->getUserEnrollments($userId);
-                $data['availableCourses'] = $courseModel->getAvailableCourses($userId);
+                $data['availableCourses'] = $enrollmentModel->getAvailableCourses($userId);
                 $data['totalEnrolled'] = count($data['enrolledCourses']);
                 $data['totalAvailable'] = count($data['availableCourses']);
 

@@ -519,12 +519,25 @@ class ManageUsers extends BaseController
      */
     public function getTeachers()
     {
-        // Verify authentication and admin role
-        if (!session()->get('isAuthenticated') || session()->get('userRole') !== 'admin') {
+        // Check authentication - allow both admin and teacher roles to access this
+        if (!session()->get('isAuthenticated')) {
+            log_message('error', 'Unauthorized access to getTeachers - Not authenticated');
             return $this->response->setJSON(['error' => 'Unauthorized']);
         }
 
-        $teachers = $this->userModel->where('role', 'teacher')->findAll();
+        $userRole = session()->get('userRole');
+        if ($userRole !== 'admin' && $userRole !== 'teacher') {
+            log_message('error', 'Unauthorized access to getTeachers - Invalid role: ' . $userRole);
+            return $this->response->setJSON(['error' => 'Unauthorized']);
+        }
+
+        $teachers = $this->userModel->where('role', 'teacher')->where('status', 'active')->findAll();
+        log_message('info', 'Teachers found: ' . count($teachers) . ', User role: ' . $userRole);
+
+        // Ensure we return an array
+        if (!is_array($teachers)) {
+            $teachers = [];
+        }
 
         return $this->response->setJSON($teachers);
     }

@@ -117,13 +117,28 @@ class Course extends BaseController
     public function index()
     {
         $db = \Config\Database::connect();
-
-        $courses = $db->table('courses')
+        $builder = $db->table('courses')
                     ->select('courses.*, users.name as teacher_name')
-                    ->join('users', 'users.id = courses.teacher_id', 'left')
-                    ->orderBy('courses.created_at', 'DESC')
-                    ->get()
-                    ->getResultArray();
+                    ->join('users', 'users.id = courses.teacher_id', 'left');
+
+        // For students, exclude courses they're already enrolled in
+        $session = session();
+        if ($session->get('isAuthenticated') && $session->get('userRole') === 'student') {
+            $userId = $session->get('userId');
+            $enrollments = $db->table('enrollments')
+                             ->select('course_id')
+                             ->where('user_id', $userId)
+                             ->get()
+                             ->getResultArray();
+            $enrolledCourseIds = array_column($enrollments, 'course_id');
+            if (!empty($enrolledCourseIds)) {
+                $builder->whereNotIn('courses.id', $enrolledCourseIds);
+            }
+        }
+
+        $courses = $builder->orderBy('courses.created_at', 'DESC')
+                           ->get()
+                           ->getResultArray();
 
         $data['courses'] = $courses;
         return view('course/index', $data);
@@ -139,10 +154,25 @@ class Course extends BaseController
                     ->select('courses.*, users.name as teacher_name')
                     ->join('users', 'users.id = courses.teacher_id', 'left');
 
+        // For students, exclude courses they're already enrolled in
+        $session = session();
+        if ($session->get('isAuthenticated') && $session->get('userRole') === 'student') {
+            $userId = $session->get('userId');
+            $enrollments = $db->table('enrollments')
+                             ->select('course_id')
+                             ->where('user_id', $userId)
+                             ->get()
+                             ->getResultArray();
+            $enrolledCourseIds = array_column($enrollments, 'course_id');
+            if (!empty($enrolledCourseIds)) {
+                $builder->whereNotIn('courses.id', $enrolledCourseIds);
+            }
+        }
+
         if (!empty($searchTerm)) {
             $builder->groupStart()
-                    ->like('courses.title', $searchTerm)
-                    ->orLike('courses.description', $searchTerm)
+                    ->like('courses.title', $searchTerm . '%')
+                    ->orLike('courses.description', $searchTerm . '%')
                     ->groupEnd();
         }
 

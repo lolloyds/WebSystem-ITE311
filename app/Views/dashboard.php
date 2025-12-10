@@ -288,8 +288,8 @@ $(document).ready(function() {
                 // Show success message
                 alert('Successfully enrolled in "' + courseTitle + '"!');
 
-                // Optionally refresh the page to update enrolled courses
-                // location.reload();
+                // Refresh the page to update enrolled courses and available courses
+                location.reload();
             } else {
                 alert(response.message || 'Failed to enroll in the course.');
                 button.prop('disabled', false);
