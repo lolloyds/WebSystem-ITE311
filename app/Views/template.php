@@ -57,6 +57,7 @@
       <!-- Navbar Links -->
       <div class="collapse navbar-collapse" id="mainNavbar">
         <ul class="navbar-nav ms-auto">
+          <?php if (!session()->get('isAuthenticated')): ?>
           <li class="nav-item">
             <a class="nav-link" href="<?= base_url('/') ?>">Home</a>
           </li>
@@ -66,6 +67,7 @@
           <li class="nav-item">
             <a class="nav-link" href="<?= base_url('contact') ?>">Contact</a>
           </li>
+          <?php endif; ?>
           <?php if (session()->get('isAuthenticated')): ?>
             <?php $role = (string) session()->get('userRole'); ?>
             <?php if ($role !== 'admin'): ?>
@@ -106,7 +108,7 @@
             <?php $role = (string) session()->get('userRole'); ?>
             <?php if ($role === 'admin' && uri_string() !== 'manage-users'): ?>
               <li class="nav-item">
-                <a class="nav-link" href="<?= base_url('admin/dashboard') ?>">Admin</a>
+                <a class="nav-link" href="<?= base_url('manage-users') ?>">Manage Users</a>
               </li>
             <?php elseif ($role === 'teacher'): ?>
               <li class="nav-item">

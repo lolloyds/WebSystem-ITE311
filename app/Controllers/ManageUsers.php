@@ -75,6 +75,14 @@ class ManageUsers extends BaseController
             ]);
         }
 
+        // Validate name format (only letters, spaces, hyphens, apostrophes)
+        if (!preg_match('/^[a-zA-Z\s\-\']+$/', $name)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Name can only contain letters, spaces, hyphens, and apostrophes.'
+            ]);
+        }
+
         // Validate email format
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return $this->response->setJSON([
@@ -357,4 +365,3 @@ class ManageUsers extends BaseController
         }
     }
 }
-

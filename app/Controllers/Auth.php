@@ -108,6 +108,11 @@ class Auth extends BaseController
                 return redirect()->back()->withInput()->with('register_error', 'All fields must be completed.');
             }
 
+            // Validate name format (only letters, spaces, hyphens, apostrophes)
+            if (!preg_match('/^[a-zA-Z\s\-\']+$/', $fullName)) {
+                return redirect()->back()->withInput()->with('register_error', 'Name can only contain letters, spaces, hyphens, and apostrophes.');
+            }
+
             // Validate email format
             if (! filter_var($emailAddress, FILTER_VALIDATE_EMAIL)) {
                 return redirect()->back()->withInput()->with('register_error', 'Please enter a valid email address.');
