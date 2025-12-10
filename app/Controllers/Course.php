@@ -2,17 +2,20 @@
 
 namespace App\Controllers;
 
+use App\Models\CourseModel;
 use App\Models\EnrollmentModel;
 use App\Models\NotificationModel;
 use CodeIgniter\Controller;
 
 class Course extends BaseController
 {
+    protected $courseModel;
     protected $enrollmentModel;
     protected $notificationModel;
 
     public function __construct()
     {
+        $this->courseModel = new CourseModel();
         $this->enrollmentModel = new EnrollmentModel();
         $this->notificationModel = new NotificationModel();
     }
@@ -223,5 +226,238 @@ class Course extends BaseController
             'success' => true,
             'courses' => $filteredCourses
         ]);
+    }
+
+    /**
+     * Admin dashboard for course management
+     */
+    public function admin()
+    {
+        $session = session();
+        if (!$session->get('isAuthenticated') || $session->get('userRole') !== 'admin') {
+            return redirect()->to('/login');
+        }
+
+        $data['totalCourses'] = $this->courseModel->getTotalCourses();
+        $data['activeCourses'] = $this->courseModel->getActiveCourses();
+        $data['courses'] = $this->courseModel->getCoursesWithTeacher();
+
+        return view('course/admin', $data);
+    }
+
+    /**
+     * Get courses for admin table via AJAX
+     */
+    public function adminCourses()
+    {
+        $session = session();
+        if (!$session->get('isAuthenticated') || $session->get('userRole') !== 'admin') {
+            return $this->response->setJSON(['error' => 'Unauthorized']);
+        }
+
+        $search = $this->request->getGet('search') ?? '';
+        $courses = $this->courseModel->getCoursesWithTeacher($search);
+
+        return $this->response->setJSON($courses);
+    }
+
+    /**
+     * Update course details via AJAX
+     */
+    public function update()
+    {
+        $session = session();
+        if (!$session->get('isAuthenticated') || $session->get('userRole') !== 'admin') {
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+        }
+
+        $courseId = $this->request->getPost('course_id');
+        $startDate = $this->request->getPost('start_date');
+        $endDate = $this->request->getPost('end_date');
+
+        // Validate dates
+        if (strtotime($startDate) > strtotime($endDate)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Start date cannot be after end date.'
+            ]);
+        }
+
+        $data = [
+            'course_code' => $this->request->getPost('course_code'),
+            'school_year' => $this->request->getPost('school_year'),
+            'semester' => $this->request->getPost('semester'),
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'title' => $this->request->getPost('title'),
+            'description' => $this->request->getPost('description'),
+            'teacher_id' => $this->request->getPost('teacher_id'),
+            'schedule' => $this->request->getPost('schedule'),
+            'status' => $this->request->getPost('status')
+        ];
+
+        if ($this->courseModel->update($courseId, $data)) {
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'Course updated successfully.'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Failed to update course.'
+            ]);
+        }
+    }
+
+    /**
+     * Create a new course via AJAX
+     */
+    public function create()
+    {
+        $session = session();
+        if (!$session->get('isAuthenticated') || $session->get('userRole') !== 'admin') {
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+        }
+
+        $startDate = $this->request->getPost('start_date');
+        $endDate = $this->request->getPost('end_date');
+
+        // Validate dates
+        if (strtotime($startDate) > strtotime($endDate)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Start date cannot be after end date.'
+            ]);
+        }
+
+        // Check if course code already exists
+        $existingCourse = $this->courseModel->where('course_code', $this->request->getPost('course_code'))->first();
+        if ($existingCourse) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Course code already exists. Please choose a different code.'
+            ]);
+        }
+
+        $data = [
+            'course_code' => $this->request->getPost('course_code'),
+            'title' => $this->request->getPost('title'),
+            'description' => $this->request->getPost('description'),
+            'school_year' => $this->request->getPost('school_year'),
+            'semester' => $this->request->getPost('semester'),
+            'schedule' => $this->request->getPost('schedule'),
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'teacher_id' => $this->request->getPost('teacher_id'),
+            'status' => $this->request->getPost('status') ?? 'active',
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+
+        if ($this->courseModel->insert($data)) {
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'Course created successfully.'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Failed to create course.'
+            ]);
+        }
+    }
+
+    /**
+     * Get course details for editing
+     */
+    public function getCourse($id)
+    {
+        $session = session();
+        if (!$session->get('isAuthenticated') || $session->get('userRole') !== 'admin') {
+            return $this->response->setJSON(['error' => 'Unauthorized']);
+        }
+
+        $course = $this->courseModel->getCourseWithTeacher($id);
+        if ($course) {
+            return $this->response->setJSON($course);
+        } else {
+            return $this->response->setJSON(['error' => 'Course not found']);
+        }
+    }
+
+    /**
+     * Teacher course management dashboard
+     */
+    public function teacherCourses()
+    {
+        $session = session();
+        if (!$session->get('isAuthenticated') || $session->get('userRole') !== 'teacher') {
+            return redirect()->to('/login');
+        }
+
+        $teacherId = $session->get('userId');
+        $courses = $this->courseModel->where('teacher_id', $teacherId)->findAll();
+
+        $data['courses'] = $courses;
+        return view('course/teacher', $data);
+    }
+
+    /**
+     * Create course for teacher (auto-assigns current teacher)
+     */
+    public function createTeacherCourse()
+    {
+        $session = session();
+        if (!$session->get('isAuthenticated') || $session->get('userRole') !== 'teacher') {
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+        }
+
+        $teacherId = $session->get('userId');
+        $startDate = $this->request->getPost('start_date');
+        $endDate = $this->request->getPost('end_date');
+
+        // Validate dates
+        if (strtotime($startDate) > strtotime($endDate)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Start date cannot be after end date.'
+            ]);
+        }
+
+        // Check if course code already exists
+        $existingCourse = $this->courseModel->where('course_code', $this->request->getPost('course_code'))->first();
+        if ($existingCourse) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Course code already exists. Please choose a different code.'
+            ]);
+        }
+
+        $data = [
+            'course_code' => $this->request->getPost('course_code'),
+            'title' => $this->request->getPost('title'),
+            'description' => $this->request->getPost('description'),
+            'school_year' => $this->request->getPost('school_year'),
+            'semester' => $this->request->getPost('semester'),
+            'schedule' => $this->request->getPost('schedule'),
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'teacher_id' => $teacherId, // Auto-assign current teacher
+            'status' => $this->request->getPost('status') ?? 'active',
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+
+        if ($this->courseModel->insert($data)) {
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'Course created successfully.'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Failed to create course.'
+            ]);
+        }
     }
 }

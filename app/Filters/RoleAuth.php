@@ -57,10 +57,12 @@ class RoleAuth implements FilterInterface
 
         // Define role-based access rules
         if ($userRole === 'admin') {
-            // Admin can access any route starting with /admin, plus general routes, and materials routes
+            // Admin can access any route starting with /admin, /course, plus general routes, and materials routes
             if (str_starts_with($currentURI, '/admin') ||
-                str_starts_with($currentURI, '/materials')) {
-                // Allow admin routes and materials routes
+                str_starts_with($currentURI, '/course') ||
+                str_starts_with($currentURI, '/materials') ||
+                str_starts_with($currentURI, '/manage-users')) {
+                // Allow admin routes, course routes, materials routes, and manage-users routes
                 return;
             } elseif (in_array($currentURI, ['/', '/about', '/contact', '/announcements', '/dashboard', '/settings', '/login', '/register', '/logout'])) {
                 // Allow general routes

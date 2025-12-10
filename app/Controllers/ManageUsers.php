@@ -513,4 +513,19 @@ class ManageUsers extends BaseController
             ]);
         }
     }
+
+    /**
+     * Get all teachers for dropdown
+     */
+    public function getTeachers()
+    {
+        // Verify authentication and admin role
+        if (!session()->get('isAuthenticated') || session()->get('userRole') !== 'admin') {
+            return $this->response->setJSON(['error' => 'Unauthorized']);
+        }
+
+        $teachers = $this->userModel->where('role', 'teacher')->findAll();
+
+        return $this->response->setJSON($teachers);
+    }
 }

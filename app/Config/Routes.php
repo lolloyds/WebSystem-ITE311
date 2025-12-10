@@ -31,8 +31,17 @@ $routes->get('/course/enrolled', 'Course::getEnrolledCourses');
 $routes->get('/course/enrolled/search', 'Course::getEnrolledCourses');
 $routes->get('/course/view/(:num)', 'Course::view/$1');
 
-// announcements route
+// announcements routes
 $routes->get('/announcements', 'Announcement::index');
+$routes->post('/announcement/create', 'Announcement::create');
+
+// assignment routes
+$routes->get('/assignment/create/(:num)', 'Assignment::createForm/$1');
+$routes->post('/assignment/create', 'Assignment::create');
+$routes->get('/assignment/courses', 'Assignment::getCourses');
+$routes->get('/assignment/view/(:num)', 'Assignment::view/$1');
+$routes->get('/assignment/show/(:num)', 'Assignment::show/$1');
+$routes->get('/assignment/student/list', 'Assignment::getStudentAssignments');
 
 // role-based dashboard routes (protected by RoleAuth filter)
 $routes->group('teacher', ['filter' => 'roleauth'], function($routes) {
@@ -42,6 +51,17 @@ $routes->group('teacher', ['filter' => 'roleauth'], function($routes) {
 $routes->group('admin', ['filter' => 'roleauth'], function($routes) {
     $routes->get('dashboard', 'Admin::dashboard');
 });
+
+// Course admin routes (admin only) - remove filter from group, check in controller
+$routes->get('course/admin', 'Course::admin');
+$routes->get('course/adminCourses', 'Course::adminCourses');
+$routes->get('course/getCourse/(:num)', 'Course::getCourse/$1');
+$routes->post('course/update', 'Course::update');
+$routes->post('course/create', 'Course::create');
+
+// Course teacher routes (teacher only) - check in controller
+$routes->get('course/teacher', 'Course::teacherCourses');
+$routes->post('course/teacher/create', 'Course::createTeacherCourse');
 
 // Materials routes
 $routes->get('materials/upload/(:num)', 'Materials::upload/$1');
@@ -61,3 +81,4 @@ $routes->post('manage-users/update-role', 'ManageUsers::updateRole');
 $routes->post('manage-users/toggle-status', 'ManageUsers::toggleStatus');
 $routes->post('manage-users/change-password', 'ManageUsers::changePassword');
 $routes->post('manage-users/edit', 'ManageUsers::editUser');
+$routes->get('manage-users/get-teachers', 'ManageUsers::getTeachers');

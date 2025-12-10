@@ -106,13 +106,19 @@
 
           <?php if (session()->get('isAuthenticated')): ?>
             <?php $role = (string) session()->get('userRole'); ?>
-            <?php if ($role === 'admin' && uri_string() !== 'manage-users'): ?>
+            <?php if ($role === 'admin'): ?>
+              <li class="nav-item">
+                <a class="nav-link" href="<?= base_url('course/admin') ?>">Course Management</a>
+              </li>
               <li class="nav-item">
                 <a class="nav-link" href="<?= base_url('manage-users') ?>">Manage Users</a>
               </li>
             <?php elseif ($role === 'teacher'): ?>
               <li class="nav-item">
-                <a class="nav-link" href="<?= base_url('teacher/dashboard') ?>">Teacher</a>
+                <a class="nav-link" href="<?= base_url('course/teacher') ?>">My Courses</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="<?= base_url('teacher/dashboard') ?>">Dashboard</a>
               </li>
             <?php endif; ?>
           <?php endif; ?>
