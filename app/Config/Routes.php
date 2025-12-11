@@ -42,6 +42,13 @@ $routes->get('/assignment/courses', 'Assignment::getCourses');
 $routes->get('/assignment/view/(:num)', 'Assignment::view/$1');
 $routes->get('/assignment/show/(:num)', 'Assignment::show/$1');
 $routes->get('/assignment/student/list', 'Assignment::getStudentAssignments');
+$routes->get('/assignment/course/(:num)', 'Assignment::getCourseAssignments/$1');
+$routes->post('/assignment/submit', 'Assignment::submit');
+$routes->get('/assignment/getSubmission/(:num)', 'Assignment::getSubmission/$1');
+$routes->get('/assignment/getSubmissions/(:num)', 'Assignment::getSubmissions/$1');
+$routes->get('/assignment/grade/(:num)', 'Assignment::grade/$1');
+$routes->post('/assignment/saveGrade', 'Assignment::saveGrade');
+$routes->get('/assignment/getAllGrades', 'Assignment::getAllGrades');
 
 // role-based dashboard routes (protected by RoleAuth filter)
 $routes->group('teacher', ['filter' => 'roleauth'], function($routes) {

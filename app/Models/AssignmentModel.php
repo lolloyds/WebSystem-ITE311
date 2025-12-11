@@ -12,7 +12,7 @@ class AssignmentModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['course_id', 'title', 'description', 'due_date', 'created_by'];
+    protected $allowedFields    = ['course_id', 'title', 'description', 'due_date', 'attachment', 'created_by'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;

@@ -44,6 +44,23 @@
                         </div>
                     </div>
 
+                    <!-- Assignment Attachment -->
+                    <?php if (!empty($assignment['attachment'])): ?>
+                        <div class="mb-4">
+                            <h5 class="text-muted mb-3">
+                                <i class="bi bi-paperclip me-2"></i>Attachment
+                            </h5>
+                            <div class="border-start border-info border-3 ps-3">
+                                <a href="<?= base_url($assignment['attachment']) ?>" target="_blank" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-download me-2"></i>Download Attachment
+                                </a>
+                                <small class="text-muted ms-2">
+                                    <?= pathinfo($assignment['attachment'], PATHINFO_BASENAME) ?>
+                                </small>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
                     <!-- Assignment Actions -->
                     <div class="d-flex gap-2 justify-content-between align-items-center">
                         <div>
@@ -86,21 +103,39 @@
                 </div>
             </div>
 
-            <!-- Assignment Comments/Submission Section (for future implementation) -->
+            <!-- Assignment Submission Section -->
             <div class="card shadow-sm">
                 <div class="card-header bg-light">
                     <h5 class="card-title mb-0">
-                        <i class="bi bi-chat-dots me-2"></i>Assignment Discussion
+                        <?php if ($isTeacher): ?>
+                            <i class="bi bi-list-check me-2"></i>Student Submissions
+                        <?php else: ?>
+                            <i class="bi bi-upload me-2"></i>Your Submission
+                        <?php endif; ?>
                     </h5>
                 </div>
                 <div class="card-body">
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle me-2"></i>
-                        Assignment discussion and submission features will be available soon.
-                        <?php if (!$isTeacher): ?>
-                            Contact your instructor if you have questions about this assignment.
-                        <?php endif; ?>
-                    </div>
+                    <?php if ($isTeacher): ?>
+                        <!-- Teacher View: List of submissions -->
+                        <div id="submissionsList">
+                            <div class="text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2">Loading submissions...</p>
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <!-- Student View: Submission form or status -->
+                        <div id="submissionArea">
+                            <div class="text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2">Loading submission status...</p>
+                            </div>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -108,10 +143,228 @@
 </div>
 
 <script>
-// Function to mark assignment as completed (placeholder for future implementation)
-function markAsCompleted(assignmentId) {
-    alert('Assignment completion tracking will be implemented soon!');
-    // TODO: Implement assignment completion tracking
+document.addEventListener('DOMContentLoaded', function() {
+    const assignmentId = <?= $assignment['id'] ?>;
+    const isTeacher = <?= $isTeacher ? 'true' : 'false' ?>;
+
+    if (isTeacher) {
+        loadTeacherSubmissions(assignmentId);
+    } else {
+        loadStudentSubmission(assignmentId);
+    }
+});
+
+// Load submissions for teacher view
+function loadTeacherSubmissions(assignmentId) {
+    fetch('<?= site_url('assignment/getSubmissions/') ?>' + assignmentId, {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            displayTeacherSubmissions(data.submissions);
+        } else {
+            document.getElementById('submissionsList').innerHTML =
+                '<div class="alert alert-info"><i class="bi bi-info-circle me-2"></i>No submissions found yet.</div>';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('submissionsList').innerHTML =
+            '<div class="alert alert-danger"><i class="bi bi-exclamation-triangle me-2"></i>Failed to load submissions.</div>';
+    });
+}
+
+// Display submissions in teacher view
+function displayTeacherSubmissions(submissions) {
+    if (submissions.length === 0) {
+        document.getElementById('submissionsList').innerHTML =
+            '<div class="alert alert-info"><i class="bi bi-info-circle me-2"></i>No submissions found yet.</div>';
+        return;
+    }
+
+    let html = '<div class="table-responsive"><table class="table table-hover">';
+    html += '<thead><tr><th>Student</th><th>Submitted</th><th>Status</th><th>Grade</th><th>Actions</th></tr></thead><tbody>';
+
+    submissions.forEach(submission => {
+        const submittedDate = submission.submitted_at ? new Date(submission.submitted_at).toLocaleDateString() : 'Not submitted';
+        const statusBadge = getStatusBadge(submission.status, submission.grade);
+        const gradeDisplay = submission.grade || (submission.status === 'graded' ? 'Graded' : 'Not graded');
+
+        html += `<tr>
+            <td>${submission.student_name}</td>
+            <td>${submittedDate}</td>
+            <td>${statusBadge}</td>
+            <td>${gradeDisplay}</td>
+            <td>
+                ${submission.file_path ? `<a href="${submission.file_path}" target="_blank" class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-download"></i></a>` : ''}
+                ${submission.status === 'submitted' || submission.status === 'late' ?
+                    `<button class="btn btn-sm btn-success" onclick="gradeSubmission(${submission.id})"><i class="bi bi-check-circle"></i> Grade</button>` :
+                    `<button class="btn btn-sm btn-warning" onclick="gradeSubmission(${submission.id})"><i class="bi bi-pencil"></i> Edit Grade</button>`}
+            </td>
+        </tr>`;
+    });
+
+    html += '</tbody></table></div>';
+    document.getElementById('submissionsList').innerHTML = html;
+}
+
+// Load student submission status
+function loadStudentSubmission(assignmentId) {
+    fetch('<?= site_url('assignment/getSubmission/') ?>' + assignmentId, {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            displayStudentSubmission(data.submission);
+        } else {
+            displaySubmissionForm(assignmentId);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('submissionArea').innerHTML =
+            '<div class="alert alert-danger"><i class="bi bi-exclamation-triangle me-2"></i>Failed to load submission status.</div>';
+    });
+}
+
+// Display existing submission for student
+function displayStudentSubmission(submission) {
+    let html = '';
+
+    if (submission.grade) {
+        // Graded submission
+        html += `<div class="alert alert-success">
+            <h6><i class="bi bi-check-circle me-2"></i>Assignment Graded</h6>
+            <p class="mb-1"><strong>Grade:</strong> ${submission.grade}</p>`;
+        if (submission.feedback) {
+            html += `<p class="mb-1"><strong>Feedback:</strong> ${submission.feedback}</p>`;
+        }
+        html += `<small class="text-muted">Graded on: ${new Date(submission.graded_at).toLocaleDateString()}</small></div>`;
+    } else {
+        // Submitted but not graded
+        html += `<div class="alert alert-info">
+            <i class="bi bi-info-circle me-2"></i>Your assignment has been submitted and is pending grading.
+        </div>`;
+    }
+
+    // Show submission details
+    html += `<div class="border rounded p-3 mb-3">
+        <h6>Submission Details</h6>
+        <p><strong>Submitted:</strong> ${new Date(submission.submitted_at).toLocaleDateString()}</p>`;
+    if (submission.file_path) {
+        html += `<p><strong>File:</strong> <a href="${submission.file_path}" target="_blank">${submission.file_path.split('/').pop()}</a></p>`;
+    }
+    if (submission.notes) {
+        html += `<p><strong>Notes:</strong> ${submission.notes}</p>`;
+    }
+    html += '</div>';
+
+    document.getElementById('submissionArea').innerHTML = html;
+}
+
+// Display submission form for student
+function displaySubmissionForm(assignmentId) {
+    const html = `
+        <form id="submissionForm">
+            <input type="hidden" name="assignment_id" value="${assignmentId}">
+
+            <div class="mb-3">
+                <label for="submissionFile" class="form-label">
+                    <i class="bi bi-file-earmark me-1"></i>Upload File <span class="text-danger">*</span>
+                </label>
+                <input type="file" class="form-control" id="submissionFile" name="file" required
+                       accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.zip,.rar">
+                <div class="form-text">
+                    Allowed file types: PDF, DOC, DOCX, TXT, JPG, JPEG, PNG, ZIP, RAR. Max size: 20MB.
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="submissionNotes" class="form-label">
+                    <i class="bi bi-chat-dots me-1"></i>Notes (Optional)
+                </label>
+                <textarea class="form-control" id="submissionNotes" name="notes" rows="3"
+                          placeholder="Add any additional notes or comments..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+                <i class="bi bi-upload me-2"></i>Submit Assignment
+            </button>
+        </form>
+    `;
+
+    document.getElementById('submissionArea').innerHTML = html;
+
+    // Add form submission handler
+    document.getElementById('submissionForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        submitAssignment(assignmentId);
+    });
+}
+
+// Submit assignment
+function submitAssignment(assignmentId) {
+    const submitBtn = document.getElementById('submitBtn');
+    const originalText = submitBtn.innerHTML;
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Submitting...';
+
+    const formData = new FormData(document.getElementById('submissionForm'));
+
+    fetch('<?= site_url('assignment/submit') ?>', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('submissionArea').innerHTML =
+                '<div class="alert alert-success"><i class="bi bi-check-circle me-2"></i>Assignment submitted successfully!</div>';
+        } else {
+            alert('Error: ' + data.message);
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while submitting the assignment.');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    });
+}
+
+// Grade submission (opens modal or redirects)
+function gradeSubmission(submissionId) {
+    window.location.href = '<?= site_url('assignment/grade/') ?>' + submissionId;
+}
+
+// Helper function to get status badge
+function getStatusBadge(status, grade) {
+    if (grade) {
+        return '<span class="badge bg-success">Graded</span>';
+    }
+
+    switch(status) {
+        case 'submitted':
+            return '<span class="badge bg-warning">Submitted</span>';
+        case 'late':
+            return '<span class="badge bg-danger">Late</span>';
+        default:
+            return '<span class="badge bg-secondary">Not Submitted</span>';
+    }
 }
 </script>
 

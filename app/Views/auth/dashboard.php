@@ -3,20 +3,33 @@
 <?= $this->section('content') ?>
 
 <!-- Dashboard Header -->
-<div class="d-flex justify-content-between align-items-center mb-4 p-3 rounded-3 shadow-sm" 
+<div class="d-flex justify-content-between align-items-center mb-4 p-3 rounded-3 shadow-sm"
      style="background: linear-gradient(90deg, #0d6efd, #0dcaf0); color: #fff;">
     <h1 class="h3 mb-0 d-flex align-items-center">
         <i class="bi bi-speedometer2 me-2"></i> Dashboard ⚡
     </h1>
-    <div class="text-end">
-        <?php 
-            $userName = session()->get('userName'); 
-            $userRole = ucfirst((string) session()->get('userRole')); 
+    <div class="d-flex align-items-center gap-2">
+        <?php
+            $userName = session()->get('userName');
+            $userRole = ucfirst((string) session()->get('userRole'));
             $role     = $role ?? strtolower($userRole) ?? 'student';
+
+            // Debug: Show role for troubleshooting (uncomment if needed)
+            // echo "<!-- DEBUG: userRole='$userRole', role='$role' -->";
         ?>
-        <div class="fw-semibold">Welcome, <strong><?= esc($userName) ?></strong> 👋</div>
-        <div class="small">
-            <i class="bi bi-person-badge me-1"></i> Role: <?= esc($userRole) ?>
+        <?php if ($role === 'student'): ?>
+            <button class="btn btn-info btn-sm" onclick="showStudentAssignments()">
+                <i class="bi bi-file-earmark-text me-1"></i>Assignments
+            </button>
+            <button class="btn btn-success btn-sm" onclick="showStudentGrades()">
+                <i class="bi bi-award me-1"></i>Grades
+            </button>
+        <?php endif; ?>
+        <div class="text-end ms-3">
+            <div class="fw-semibold">Welcome, <strong><?= esc($userName) ?></strong> 👋</div>
+            <div class="small">
+                <i class="bi bi-person-badge me-1"></i> Role: <?= esc($userRole) ?>
+            </div>
         </div>
     </div>
 </div>
@@ -360,6 +373,262 @@
             }
         }
     });
+
+    // Assignment and Grades Functions
+    function showStudentAssignments() {
+        // Load assignments content
+        fetch('<?= base_url('assignment/student/list') ?>')
+            .then(response => response.json())
+            .then(data => {
+                let content = '';
+
+                if (data.assignments && data.assignments.length > 0) {
+                    content = '<div class="row">';
+
+                    data.assignments.forEach(assignment => {
+                        const dueDate = assignment.due_date ?
+                            new Date(assignment.due_date).toLocaleString() : 'No due date';
+                        const courseName = assignment.course_name || 'Unknown Course';
+
+                        content += `
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100 border">
+                                    <div class="card-body d-flex flex-column">
+                                        <h6 class="card-title">
+                                            <i class="bi bi-file-earmark-text text-success me-2"></i>
+                                            ${assignment.title}
+                                        </h6>
+                                        <p class="card-text text-muted small mb-1">
+                                            <strong>Course:</strong> ${courseName}
+                                        </p>
+                                        <p class="card-text small text-truncate">
+                                            ${assignment.description.substring(0, 100)}${assignment.description.length > 100 ? '...' : ''}
+                                        </p>
+                                        <div class="mt-auto">
+                                            ${assignment.due_date ? `<small class="text-danger">
+                                                <i class="bi bi-calendar-x me-1"></i>Due: ${dueDate}
+                                            </small><br>` : ''}
+                                            <small class="text-muted">
+                                                <i class="bi bi-clock me-1"></i>Posted: ${new Date(assignment.created_at).toLocaleString()}
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer bg-light">
+                                        <button class="btn btn-success btn-sm w-100" onclick="viewAssignmentFromDashboard(${assignment.id})">
+                                            <i class="bi bi-eye me-1"></i> View Assignment
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    content += '</div>';
+                } else {
+                    content = `
+                        <div class="text-center py-5">
+                            <i class="bi bi-file-earmark-text text-muted" style="font-size: 3rem;"></i>
+                            <h4 class="text-muted mt-3">No Assignments Yet</h4>
+                            <p class="text-muted">You don't have any assignments at the moment. Check back later!</p>
+                        </div>
+                    `;
+                }
+
+                // Show modal with content
+                showModal('My Assignments', content);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('danger', 'Failed to load assignments. Please try again.');
+            });
+    }
+
+    function showStudentGrades() {
+        // Load all grades for the student
+        fetch('<?= base_url('assignment/getAllGrades') ?>')
+            .then(response => response.json())
+            .then(data => {
+                let content = '<h5 class="mb-4">All My Grades</h5>';
+
+                if (data.grades && data.grades.length > 0) {
+                    content += '<div class="row">';
+
+                    data.grades.forEach(grade => {
+                        content += `
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100 border">
+                                    <div class="card-body d-flex flex-column">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="card-title mb-1">${grade.title}</h6>
+                                            <span class="badge bg-success fs-6">${grade.grade}</span>
+                                        </div>
+                                        <p class="card-text text-muted small mb-1">
+                                            <i class="bi bi-book me-1"></i>${grade.course_name}
+                                        </p>
+                                        ${grade.feedback ? `
+                                        <p class="card-text small mb-1">
+                                            <strong>Feedback:</strong> ${grade.feedback.substring(0, 100)}${grade.feedback.length > 100 ? '...' : ''}
+                                        </p>
+                                        ` : ''}
+                                        <small class="text-muted mt-auto">
+                                            <i class="bi bi-calendar-check me-1"></i>Graded: ${new Date(grade.graded_at).toLocaleString()}
+                                        </small>
+                                    </div>
+                                    <div class="card-footer bg-light">
+                                        <button class="btn btn-outline-success btn-sm w-100" onclick="viewGradeDetails(${grade.assignment_id})">
+                                            <i class="bi bi-eye me-1"></i>View Details
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    content += '</div>';
+                } else {
+                    content += `
+                        <div class="text-center py-5">
+                            <i class="bi bi-award text-muted" style="font-size: 3rem;"></i>
+                            <h4 class="text-muted mt-3">No Grades Yet</h4>
+                            <p class="text-muted">You don't have any graded assignments yet. Grades will appear here once your teachers have reviewed your submissions!</p>
+                        </div>
+                    `;
+                }
+
+                // Show modal with content
+                showModal('My Grades', content);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('danger', 'Failed to load grades. Please try again.');
+            });
+    }
+
+    function viewAssignmentFromDashboard(assignmentId) {
+        // Load assignment details
+        fetch('<?= base_url('assignment/view/') ?>' + assignmentId)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const assignment = data.assignment;
+                    const content = `
+                        <div class="mb-3">
+                            <h4>${assignment.title}</h4>
+                            <hr>
+                        </div>
+                        <div class="mb-3">
+                            <h6>Description:</h6>
+                            <p class="text-muted">${assignment.description.replace(/\n/g, '<br>')}</p>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <small class="text-muted">
+                                    <i class="bi bi-clock me-1"></i>
+                                    Posted: ${new Date(assignment.created_at).toLocaleString()}
+                                </small>
+                            </div>
+                            ${assignment.due_date ? `
+                            <div class="col-md-6 text-end">
+                                <small class="text-danger">
+                                    <i class="bi bi-calendar-x me-1"></i>
+                                    Due: ${new Date(assignment.due_date).toLocaleString()}
+                                </small>
+                            </div>
+                            ` : ''}
+                        </div>
+                        <div class="mt-3 text-center">
+                            <a href="<?= site_url('assignment/show/') ?>${assignmentId}" class="btn btn-primary">
+                                <i class="bi bi-eye me-1"></i> Go to Assignment Page
+                            </a>
+                        </div>
+                    `;
+
+                    // Update modal content and show
+                    const modal = new bootstrap.Modal(document.getElementById('assignmentModal'));
+                    document.querySelector('#assignmentModal .modal-title').textContent = assignment.title;
+                    document.querySelector('#assignmentModal .modal-body').innerHTML = content;
+                    modal.show();
+                } else {
+                    showAlert('danger', 'Failed to load assignment details.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('danger', 'An error occurred while loading the assignment.');
+            });
+    }
+
+    function viewGradeDetails(assignmentId) {
+        // Load submission details with grade
+        fetch('<?= base_url('assignment/getSubmission/') ?>' + assignmentId)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const submission = data.submission;
+                    const content = `
+                        <div class="alert alert-success">
+                            <h6><i class="bi bi-check-circle me-2"></i>Assignment Graded</h6>
+                            <p class="mb-1">Grade: <strong>${submission.grade}</strong></p>
+                            <p class="mb-0">Graded: ${new Date(submission.graded_at).toLocaleString()}</p>
+                        </div>
+                        ${submission.feedback ? `
+                        <div class="mb-3">
+                            <h6>Feedback:</h6>
+                            <div class="border rounded p-3 bg-light">${submission.feedback.replace(/\n/g, '<br>')}</div>
+                        </div>
+                        ` : ''}
+                        ${submission.file_path ? `
+                        <div class="mb-3">
+                            <h6>Your Submission:</h6>
+                            <a href="${submission.file_path}" target="_blank" class="btn btn-outline-primary">
+                                <i class="bi bi-download me-2"></i>Download Your Submission
+                            </a>
+                        </div>
+                        ` : ''}
+                    `;
+
+                    // Update modal content and show
+                    const modal = new bootstrap.Modal(document.getElementById('assignmentModal'));
+                    document.querySelector('#assignmentModal .modal-title').textContent = 'Grade Details';
+                    document.querySelector('#assignmentModal .modal-body').innerHTML = content;
+                    modal.show();
+                } else {
+                    showAlert('danger', 'Grade details not found.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('danger', 'Failed to load grade details.');
+            });
+    }
+
+    function showModal(title, content) {
+        // Create modal if it doesn't exist
+        if (!document.getElementById('assignmentModal')) {
+            const modalHtml = `
+                <div class="modal fade" id="assignmentModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">${title}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                ${content}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        } else {
+            document.querySelector('#assignmentModal .modal-title').textContent = title;
+            document.querySelector('#assignmentModal .modal-body').innerHTML = content;
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById('assignmentModal'));
+        modal.show();
+    }
     </script>
 <?php endif; ?>
 

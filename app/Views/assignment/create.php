@@ -70,6 +70,17 @@
                             </div>
                         </div>
 
+                        <div class="mb-4">
+                            <label for="attachment" class="form-label">
+                                <i class="bi bi-paperclip me-1"></i>Attachment (Optional)
+                            </label>
+                            <input type="file" class="form-control" id="attachment" name="attachment"
+                                   accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png">
+                            <div class="form-text">
+                                Allowed file types: PDF, DOC, DOCX, TXT, JPG, JPEG, PNG. Max size: 10MB.
+                            </div>
+                        </div>
+
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-success" id="submitBtn">
                                 <i class="bi bi-check-circle me-2"></i>Create Assignment

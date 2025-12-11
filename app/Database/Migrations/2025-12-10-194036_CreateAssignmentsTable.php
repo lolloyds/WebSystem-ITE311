@@ -31,6 +31,11 @@ class CreateAssignmentsTable extends Migration
                 'type' => 'DATETIME',
                 'null' => true,
             ],
+            'attachment' => [
+                'type' => 'VARCHAR',
+                'constraint' => 255,
+                'null' => true,
+            ],
             'created_by' => [
                 'type' => 'INT',
                 'constraint' => 11,
