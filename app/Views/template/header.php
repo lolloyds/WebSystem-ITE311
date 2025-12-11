@@ -14,7 +14,14 @@
         <ul class="navbar-nav ms-auto">
           <?php if (session()->get('isAuthenticated')): ?>
           <li class="nav-item">
-            <a class="nav-link" href="<?= base_url('dashboard') ?>">Dashboard</a>
+            <?php $role = (string) session()->get('userRole'); ?>
+            <?php if ($role === 'admin'): ?>
+              <a class="nav-link" href="<?= base_url('admin/dashboard') ?>">Dashboard</a>
+            <?php elseif ($role === 'teacher'): ?>
+              <a class="nav-link" href="<?= base_url('teacher/dashboard') ?>">Dashboard</a>
+            <?php else: ?>
+              <a class="nav-link" href="<?= base_url('dashboard') ?>">Dashboard</a>
+            <?php endif; ?>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="<?= base_url('courses') ?>">Courses</a>

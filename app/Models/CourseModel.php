@@ -114,10 +114,10 @@ class CourseModel extends Model
      */
     public function getTeacherCourseEnrollments($teacherId)
     {
-        return $this->db->table('courses')
+        return $this->db->table('enrollments')
             ->select('enrollments.*, users.name as student_name, courses.title as course_name, courses.course_code')
-            ->join('enrollments', 'enrollments.course_id = courses.id', 'left')
-            ->join('users', 'users.id = enrollments.user_id', 'left')
+            ->join('courses', 'courses.id = enrollments.course_id')
+            ->join('users', 'users.id = enrollments.user_id')
             ->where('courses.teacher_id', $teacherId)
             ->orderBy('enrollments.enrolled_at', 'DESC')
             ->get()

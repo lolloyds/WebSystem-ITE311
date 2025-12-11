@@ -8,9 +8,19 @@ class Auth extends BaseController
 {
     public function login()
     {
-        // If already logged in
+        // If already logged in, redirect to appropriate dashboard
         if (session()->get('isAuthenticated')) {
-            return redirect()->to('/dashboard');
+            $role = session()->get('userRole');
+            switch ($role) {
+                case 'admin':
+                    return redirect()->to('/admin/dashboard');
+                case 'teacher':
+                    return redirect()->to('/teacher/dashboard');
+                case 'student':
+                    return redirect()->to('/dashboard');
+                default:
+                    return redirect()->to('/dashboard');
+            }
         }
 
         // Handle POST (form submit)
@@ -52,11 +62,11 @@ class Auth extends BaseController
             // Role-based redirection after successful login
             switch ($userRecord['role']) {
                 case 'student':
-                    return redirect()->to('/announcements')->with('success', 'Welcome back, ' . $userRecord['name'] . '!');
+                    return redirect()->to('/dashboard')->with('success', 'Welcome back, ' . $userRecord['name'] . '!');
                 case 'teacher':
-                    return redirect()->to('/dashboard')->with('success', 'Welcome back, ' . $userRecord['name'] . '!');
+                    return redirect()->to('/teacher/dashboard')->with('success', 'Welcome back, ' . $userRecord['name'] . '!');
                 case 'admin':
-                    return redirect()->to('/dashboard')->with('success', 'Welcome back, ' . $userRecord['name'] . '!');
+                    return redirect()->to('/admin/dashboard')->with('success', 'Welcome back, ' . $userRecord['name'] . '!');
                 default:
                     return redirect()->to('/dashboard')->with('success', 'Welcome back, ' . $userRecord['name'] . '!');
             }
@@ -74,8 +84,19 @@ class Auth extends BaseController
 
     public function register()
     {
+        // If already logged in, redirect to appropriate dashboard
         if (session()->get('isAuthenticated')) {
-            return redirect()->to('/dashboard');
+            $role = session()->get('userRole');
+            switch ($role) {
+                case 'admin':
+                    return redirect()->to('/admin/dashboard');
+                case 'teacher':
+                    return redirect()->to('/teacher/dashboard');
+                case 'student':
+                    return redirect()->to('/dashboard');
+                default:
+                    return redirect()->to('/dashboard');
+            }
         }
 
         if ($this->request->getMethod() === 'POST') {

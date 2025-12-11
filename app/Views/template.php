@@ -81,6 +81,47 @@
           
 
           <?php if (session()->get('isAuthenticated')): ?>
+            <?php $role = (string) session()->get('userRole'); ?>
+
+            <!-- Common links for all authenticated users -->
+            <li class="nav-item">
+              <a class="nav-link" href="<?= base_url('announcements') ?>">Announcements</a>
+            </li>
+
+            <!-- Role-specific dashboard links -->
+            <?php if ($role === 'admin'): ?>
+              <li class="nav-item">
+                <a class="nav-link" href="<?= base_url('admin/dashboard') ?>">Dashboard</a>
+              </li>
+            <?php elseif ($role === 'teacher'): ?>
+              <li class="nav-item">
+                <a class="nav-link" href="<?= base_url('teacher/dashboard') ?>">Dashboard</a>
+              </li>
+            <?php else: ?>
+              <li class="nav-item">
+                <a class="nav-link" href="<?= base_url('dashboard') ?>">Dashboard</a>
+              </li>
+            <?php endif; ?>
+
+            <!-- Role-specific additional links -->
+            <?php if ($role === 'admin'): ?>
+              <li class="nav-item">
+                <a class="nav-link" href="<?= base_url('course/admin') ?>">Course Management</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="<?= base_url('manage-users') ?>">Manage Users</a>
+              </li>
+            <?php elseif ($role === 'teacher'): ?>
+              <li class="nav-item">
+                <a class="nav-link" href="<?= base_url('course/teacher') ?>">My Courses</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="<?= base_url('teacher/manage-students') ?>">
+                  <i class="bi bi-people me-1"></i>Manage Students
+                </a>
+              </li>
+            <?php endif; ?>
+
             <!-- Notifications Dropdown -->
             <li class="nav-item dropdown">
               <a class="nav-link position-relative" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -95,32 +136,6 @@
                 </div>
               </ul>
             </li>
-            
-            <li class="nav-item">
-              <a class="nav-link" href="<?= base_url('announcements') ?>">Announcements</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="<?= base_url('dashboard') ?>">Dashboard</a>
-            </li>
-          <?php endif; ?>
-
-          <?php if (session()->get('isAuthenticated')): ?>
-            <?php $role = (string) session()->get('userRole'); ?>
-            <?php if ($role === 'admin'): ?>
-              <li class="nav-item">
-                <a class="nav-link" href="<?= base_url('course/admin') ?>">Course Management</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="<?= base_url('manage-users') ?>">Manage Users</a>
-              </li>
-            <?php elseif ($role === 'teacher'): ?>
-              <li class="nav-item">
-                <a class="nav-link" href="<?= base_url('course/teacher') ?>">My Courses</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="<?= base_url('teacher/dashboard') ?>">Dashboard</a>
-              </li>
-            <?php endif; ?>
           <?php endif; ?>
 
           <li class="nav-item">

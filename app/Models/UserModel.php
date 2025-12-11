@@ -12,7 +12,11 @@ class UserModel extends Model
     protected $returnType = 'array';
 
     protected $allowedFields = [
+        'student_id',
         'name',
+        'program',
+        'year_level',
+        'section',
         'email',
         'password',
         'role',
@@ -23,4 +27,3 @@ class UserModel extends Model
 
     protected $useTimestamps = false; // timestamps handled by DB defaults in migration
 }
-

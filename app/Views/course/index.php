@@ -493,18 +493,28 @@ $(document).ready(function() {
                 button.html('<i class="bi bi-check-circle me-1"></i> Enrolled');
                 button.prop('disabled', true);
 
-                // Show success message (simple implementation)
+                // Show success message
                 alert('Successfully enrolled in "' + courseTitle + '"!');
 
-                // Refresh enrolled courses if the tab is active
-                if ($('#enrolled').hasClass('active')) {
-                    loadEnrolledCourses();
-                }
+                // Switch to enrolled courses tab to show the newly enrolled course
+                $('#enrolled-tab').tab('show');
+                loadEnrolledCourses();
 
-                // Refresh available courses to remove the enrolled course
-                if ($('#available').hasClass('active')) {
-                    location.reload();
-                }
+                // Remove the enrolled course from available courses list
+                button.closest('.course-item').fadeOut(300, function() {
+                    $(this).remove();
+                    // Update available courses count if needed
+                    const remainingCourses = $('.course-item').length;
+                    if (remainingCourses === 0) {
+                        $('#courses-list').html(`
+                            <div class="text-center py-5">
+                                <i class="bi bi-search text-muted" style="font-size: 3rem;"></i>
+                                <h4 class="text-muted mt-3">No more courses available</h4>
+                                <p class="text-muted">You've enrolled in all available courses. Check back later for new courses.</p>
+                            </div>
+                        `);
+                    }
+                });
 
                 // Immediately refresh notifications (real-time UX)
                 if (typeof window.fetchNotifications === 'function') {

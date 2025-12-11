@@ -53,7 +53,15 @@ $routes->get('/assignment/getAllGrades', 'Assignment::getAllGrades');
 // role-based dashboard routes (protected by RoleAuth filter)
 $routes->group('teacher', ['filter' => 'roleauth'], function($routes) {
     $routes->get('dashboard', 'Teacher::dashboard');
+    $routes->get('getStudents', 'Teacher::getStudents');
+    $routes->get('getStudentDetails/(:num)', 'Teacher::getStudentDetails/$1');
+    $routes->post('updateStudentStatus', 'Teacher::updateStudentStatus');
+    $routes->post('removeStudentFromCourse', 'Teacher::removeStudentFromCourse');
+    $routes->get('getEnrollmentStats', 'Teacher::getEnrollmentStats');
 });
+
+// Separate route for manage-students to avoid conflicts
+$routes->get('teacher/manage-students', 'Teacher::manageStudents');
 
 $routes->group('admin', ['filter' => 'roleauth'], function($routes) {
     $routes->get('dashboard', 'Admin::dashboard');
