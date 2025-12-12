@@ -415,10 +415,12 @@
                                                     <i class="bi bi-calendar me-1"></i>
                                                     Created: <?= date('M d, Y', strtotime($course['created_at'])) ?>
                                                 </small>
-                                                <span class="badge bg-success">
-                                                    <i class="bi bi-people me-1"></i>
-                                                    <?= $enrollmentStats[$course['id']] ?? 0 ?> enrolled
-                                                </span>
+                                                <?php if (($enrollmentStats[$course['id']] ?? 0) > 0): ?>
+                                                    <span class="badge bg-success">
+                                                        <i class="bi bi-people me-1"></i>
+                                                        <?= $enrollmentStats[$course['id']] ?> enrolled
+                                                    </span>
+                                                <?php endif; ?>
                                             </div>
                                         </div>
                                         <div class="card-footer bg-light">
@@ -644,9 +646,20 @@ $(document).ready(function() {
                         $('.card').each(function() {
                             const card = $(this);
                             if (card.text().includes(course.title)) {
-                                const badge = card.find('.badge.bg-success');
-                                if (badge.length > 0) {
-                                    badge.html(`<i class="bi bi-people me-1"></i>${enrollmentCount} enrolled`);
+                                const badgeContainer = card.find('.d-flex.justify-content-between.align-items-center');
+                                const existingBadge = badgeContainer.find('.badge.bg-success');
+
+                                if (enrollmentCount > 0) {
+                                    if (existingBadge.length > 0) {
+                                        // Update existing badge
+                                        existingBadge.html(`<i class="bi bi-people me-1"></i>${enrollmentCount} enrolled`);
+                                    } else {
+                                        // Create new badge
+                                        badgeContainer.append(`<span class="badge bg-success"><i class="bi bi-people me-1"></i>${enrollmentCount} enrolled</span>`);
+                                    }
+                                } else {
+                                    // Remove badge if count is 0
+                                    existingBadge.remove();
                                 }
                             }
                         });

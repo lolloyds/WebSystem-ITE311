@@ -13,9 +13,9 @@ class Auth extends BaseController
             $role = session()->get('userRole');
             switch ($role) {
                 case 'admin':
-                    return redirect()->to('/admin/dashboard');
+                    return redirect()->to('/manage-users');
                 case 'teacher':
-                    return redirect()->to('/teacher/dashboard');
+                    return redirect()->to('/teacher/manage-students');
                 case 'student':
                     return redirect()->to('/dashboard');
                 default:
@@ -64,9 +64,9 @@ class Auth extends BaseController
                 case 'student':
                     return redirect()->to('/dashboard')->with('success', 'Welcome back, ' . $userRecord['name'] . '!');
                 case 'teacher':
-                    return redirect()->to('/teacher/dashboard')->with('success', 'Welcome back, ' . $userRecord['name'] . '!');
+                    return redirect()->to('/teacher/manage-students')->with('success', 'Welcome back, ' . $userRecord['name'] . '!');
                 case 'admin':
-                    return redirect()->to('/admin/dashboard')->with('success', 'Welcome back, ' . $userRecord['name'] . '!');
+                    return redirect()->to('/manage-users')->with('success', 'Welcome back, ' . $userRecord['name'] . '!');
                 default:
                     return redirect()->to('/dashboard')->with('success', 'Welcome back, ' . $userRecord['name'] . '!');
             }
@@ -89,9 +89,9 @@ class Auth extends BaseController
             $role = session()->get('userRole');
             switch ($role) {
                 case 'admin':
-                    return redirect()->to('/admin/dashboard');
+                    return redirect()->to('/manage-users');
                 case 'teacher':
-                    return redirect()->to('/teacher/dashboard');
+                    return redirect()->to('/teacher/manage-students');
                 case 'student':
                     return redirect()->to('/dashboard');
                 default:

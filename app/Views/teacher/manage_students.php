@@ -75,24 +75,20 @@
                                             <td><?= esc($student['year_level'] ?? 'N/A') ?></td>
                                             <td>
                                                 <?php
-                                                $statusBadge = match($student['status'] ?? 'active') {
-                                                    'active' => '<span class="badge bg-success">Active</span>',
-                                                    'inactive' => '<span class="badge bg-warning">Inactive</span>',
-                                                    'dropped' => '<span class="badge bg-danger">Dropped</span>',
-                                                    default => '<span class="badge bg-secondary">Unknown</span>'
-                                                };
-                                                echo $statusBadge;
+                                                $status = $student['status'] ?? 'active';
+                                                if ($status === 'active') {
+                                                    echo '<span class="badge bg-success">Active</span>';
+                                                } else {
+                                                    echo '<span class="badge bg-warning">Inactive</span>';
+                                                }
                                                 ?>
                                             </td>
                                             <td>
                                                 <div class="btn-group" role="group">
-                                                    <button class="btn btn-sm btn-outline-primary" onclick="viewStudentDetails(<?= $student['id'] ?>)">
-                                                        <i class="bi bi-eye"></i> View
+                                                    <button class="btn btn-sm btn-outline-warning" onclick="updateStudentStatus(<?= $student['id'] ?>, '<?= $student['status'] ?? 'active' ?>')">
+                                                        <i class="bi bi-check-circle"></i> Approve/Reject
                                                     </button>
-                                                    <button class="btn btn-sm btn-outline-warning" onclick="updateStudentStatus(<?= $student['id'] ?>, '<?= esc($student['status'] ?? 'active') ?>')">
-                                                        <i class="bi bi-pencil"></i> Update Status
-                                                    </button>
-                                                    <button class="btn btn-sm btn-outline-danger" onclick="removeFromCourse(<?= $student['id'] ?>, '<?= esc($student['name']) ?>')">
+                                                    <button class="btn btn-sm btn-outline-danger" onclick="removeFromCourse(<?= $student['id'] ?>, '<?= addslashes($student['name']) ?>', <?= $student['course_id'] ?>, '<?= addslashes($student['course_name']) ?>')">
                                                         <i class="bi bi-person-dash"></i> Remove
                                                     </button>
                                                 </div>
@@ -144,7 +140,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="statusUpdateModalLabel">Update Student Status</h5>
+                <h5 class="modal-title" id="statusUpdateModalLabel">Approve/Reject Student</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="statusUpdateForm">
@@ -154,23 +150,23 @@
                         <input type="text" class="form-control" id="currentStatus" readonly>
                     </div>
                     <div class="mb-3">
-                        <label for="newStatus" class="form-label">New Status <span class="text-danger">*</span></label>
+                        <label for="newStatus" class="form-label">Action <span class="text-danger">*</span></label>
                         <select class="form-select" id="newStatus" name="new_status" required>
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                            <option value="dropped">Dropped</option>
+                            <option value="active">Approve Student (Active)</option>
+                            <option value="inactive">Reject Student (Inactive)</option>
+                            <option value="dropped">Drop Student</option>
                         </select>
                     </div>
                     <div class="mb-3">
                         <label for="statusRemarks" class="form-label">Remarks</label>
-                        <textarea class="form-control" id="statusRemarks" name="remarks" rows="3" placeholder="Optional remarks..."></textarea>
+                        <textarea class="form-control" id="statusRemarks" name="remarks" rows="3" placeholder="Optional remarks for approval/rejection..."></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <input type="hidden" id="statusStudentId" name="student_id">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-check-circle me-1"></i>Update Status
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle me-1"></i>Approve/Reject
                     </button>
                 </div>
             </form>
@@ -179,6 +175,142 @@
 </div>
 
 <script>
+// Helper function to get cookie value
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+}
+
+// Global functions for action buttons - defined outside document ready for immediate availability
+window.displayStudentDetails = function(student) {
+    const enrollmentDate = student.enrollments && student.enrollments.length > 0
+        ? new Date(student.enrollments[0].enrolled_at).toLocaleDateString()
+        : 'N/A';
+
+    const content = `
+        <div class="row">
+            <div class="col-md-6">
+                <h6 class="text-primary">Basic Information</h6>
+                <table class="table table-sm">
+                    <tr>
+                        <td><strong>Student ID:</strong></td>
+                        <td>${student.student_id || 'N/A'}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Full Name:</strong></td>
+                        <td>${student.name}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Email:</strong></td>
+                        <td>${student.email}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Program:</strong></td>
+                        <td>${student.program || 'N/A'}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Year Level:</strong></td>
+                        <td>${student.year_level || 'N/A'}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Section:</strong></td>
+                        <td>${student.section || 'N/A'}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Status:</strong></td>
+                        <td>${getStatusBadgeGlobal(student.status)}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h6 class="text-primary">Enrollment Information</h6>
+                <p><strong>Enrollment Date:</strong> ${enrollmentDate}</p>
+                ${student.enrollments && student.enrollments.length > 0 ? `
+                    <p><strong>Enrolled Courses:</strong></p>
+                    <ul class="list-unstyled">
+                        ${student.enrollments.map(e => `<li>• ${e.course_name} (${e.course_code})</li>`).join('')}
+                    </ul>
+                ` : '<p>No enrollment information available.</p>'}
+            </div>
+        </div>
+    `;
+
+    $('#studentDetailsContent').html(content);
+};
+
+window.getStatusBadgeGlobal = function(status) {
+    if (status === 'active') {
+        return '<span class="badge bg-success">Active</span>';
+    } else {
+        return '<span class="badge bg-warning">Inactive</span>';
+    }
+};
+
+window.viewStudentDetails = function(studentId) {
+    $.ajax({
+        url: '<?= base_url('teacher/getStudentDetails/') ?>' + studentId,
+        type: 'GET',
+        success: function(response) {
+            if (response.error) {
+                alert(response.error);
+                return;
+            }
+
+            displayStudentDetails(response);
+            $('#studentDetailsModal').modal('show');
+        },
+        error: function() {
+            alert('Failed to load student details.');
+        }
+    });
+};
+
+window.updateStudentStatus = function(studentId, currentStatus) {
+    $('#statusStudentId').val(studentId);
+    $('#currentStatus').val(currentStatus.charAt(0).toUpperCase() + currentStatus.slice(1));
+    $('#newStatus').val(currentStatus);
+    $('#statusRemarks').val('');
+    $('#statusUpdateModal').modal('show');
+};
+
+window.removeFromCourse = function(studentId, studentName, courseId, courseName) {
+    if (confirm(`Are you sure you want to remove ${studentName} from "${courseName}"?`)) {
+        const formData = new FormData();
+        formData.append('student_id', studentId);
+        formData.append('course_id', courseId);
+
+        // Add CSRF token to form data
+        const csrfToken = $('meta[name="csrf-token"]').attr('content') || getCookie('csrf_cookie_name');
+        if (csrfToken) {
+            formData.append('csrf_test_name', csrfToken);
+        }
+
+        $.ajax({
+            url: '<?= base_url('teacher/removeStudentFromCourse') ?>',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                if (response.success) {
+                    alert(response.message);
+                    const selectedCourseId = $('#courseSelect').val();
+                    loadStudents(selectedCourseId); // Reload the table with current course filter
+                } else {
+                    alert(response.message || 'Failed to remove student from course.');
+                }
+            },
+            error: function() {
+                alert('An error occurred. Please try again.');
+            }
+        });
+    }
+};
+
+
+
 $(document).ready(function() {
     // Initialize student count on page load
     const initialStudentCount = $('#studentsTableBody tr').length;
@@ -250,13 +382,10 @@ $(document).ready(function() {
                     <td>${statusBadge}</td>
                     <td>
                         <div class="btn-group" role="group">
-                            <button class="btn btn-sm btn-outline-primary" onclick="viewStudentDetails(${student.id})">
-                                <i class="bi bi-eye"></i> View
+                            <button class="btn btn-sm btn-outline-warning" onclick="updateStudentStatus(${student.id}, '${student.status || 'active'}')">
+                                <i class="bi bi-check-circle"></i> Approve/Reject
                             </button>
-                            <button class="btn btn-sm btn-outline-warning" onclick="updateStudentStatus(${student.id}, '${student.status}')">
-                                <i class="bi bi-pencil"></i> Update Status
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger" onclick="removeFromCourse(${student.id}, '${student.name}')">
+                            <button class="btn btn-sm btn-outline-danger" onclick="removeFromCourse(${student.id}, '${student.name.replace(/'/g, "\\'")}', ${student.course_id}, '${student.course_name.replace(/'/g, "\\'")}')">
                                 <i class="bi bi-person-dash"></i> Remove
                             </button>
                         </div>
@@ -272,153 +401,11 @@ $(document).ready(function() {
     }
 
     function getStatusBadge(status) {
-        const badges = {
-            'active': '<span class="badge bg-success">Active</span>',
-            'inactive': '<span class="badge bg-warning">Inactive</span>',
-            'dropped': '<span class="badge bg-danger">Dropped</span>'
-        };
-        return badges[status] || '<span class="badge bg-secondary">Unknown</span>';
-    }
-
-    // Global functions for action buttons
-    window.viewStudentDetails = function(studentId) {
-        $.ajax({
-            url: '<?= base_url('teacher/getStudentDetails/') ?>' + studentId,
-            type: 'GET',
-            success: function(response) {
-                if (response.error) {
-                    alert(response.error);
-                    return;
-                }
-
-                displayStudentDetails(response);
-                $('#studentDetailsModal').modal('show');
-            },
-            error: function() {
-                alert('Failed to load student details.');
-            }
-        });
-    };
-
-    window.updateStudentStatus = function(studentId, currentStatus) {
-        $('#statusStudentId').val(studentId);
-        $('#currentStatus').val(currentStatus.charAt(0).toUpperCase() + currentStatus.slice(1));
-        $('#newStatus').val(currentStatus);
-        $('#statusRemarks').val('');
-        $('#statusUpdateModal').modal('show');
-    };
-
-    window.removeFromCourse = function(studentId, studentName) {
-        // Get student's enrollments to show course selection
-        $.ajax({
-            url: '<?= base_url('teacher/getStudentDetails/') ?>' + studentId,
-            type: 'GET',
-            success: function(response) {
-                if (response.error) {
-                    alert(response.error);
-                    return;
-                }
-
-                if (response.enrollments && response.enrollments.length > 0) {
-                    let courseOptions = '';
-                    response.enrollments.forEach(function(enrollment) {
-                        courseOptions += `<option value="${enrollment.course_id}">${enrollment.course_name} (${enrollment.course_code})</option>`;
-                    });
-
-                    const selectedCourse = confirm(`Remove ${studentName} from which course?\n\n${response.enrollments.map(e => e.course_name + ' (' + e.course_code + ')').join('\n')}\n\nClick OK to remove from the first course, or Cancel to abort.`);
-                    if (selectedCourse) {
-                        const courseId = response.enrollments[0].course_id; // Default to first course
-                        removeStudentFromSpecificCourse(studentId, courseId, studentName, response.enrollments[0].course_name);
-                    }
-                } else {
-                    alert('No course enrollments found for this student.');
-                }
-            },
-            error: function() {
-                alert('Failed to load student details.');
-            }
-        });
-    };
-
-    function removeStudentFromSpecificCourse(studentId, courseId, studentName, courseName) {
-        if (confirm(`Are you sure you want to remove ${studentName} from "${courseName}"?`)) {
-            $.ajax({
-                url: '<?= base_url('teacher/removeStudentFromCourse') ?>',
-                type: 'POST',
-                data: {
-                    student_id: studentId,
-                    course_id: courseId
-                },
-                success: function(response) {
-                    if (response.success) {
-                        alert(response.message);
-                        const selectedCourseId = $('#courseSelect').val();
-                        loadStudents(selectedCourseId); // Reload the table with current course filter
-                    } else {
-                        alert(response.message || 'Failed to remove student from course.');
-                    }
-                },
-                error: function() {
-                    alert('An error occurred. Please try again.');
-                }
-            });
+        if (status === 'active') {
+            return '<span class="badge bg-success">Active</span>';
+        } else {
+            return '<span class="badge bg-warning">Inactive</span>';
         }
-    }
-
-    function displayStudentDetails(student) {
-        const enrollmentDate = student.enrollments && student.enrollments.length > 0
-            ? new Date(student.enrollments[0].enrolled_at).toLocaleDateString()
-            : 'N/A';
-
-        const content = `
-            <div class="row">
-                <div class="col-md-6">
-                    <h6 class="text-primary">Basic Information</h6>
-                    <table class="table table-sm">
-                        <tr>
-                            <td><strong>Student ID:</strong></td>
-                            <td>${student.student_id || 'N/A'}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Full Name:</strong></td>
-                            <td>${student.name}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Email:</strong></td>
-                            <td>${student.email}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Program:</strong></td>
-                            <td>${student.program || 'N/A'}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Year Level:</strong></td>
-                            <td>${student.year_level || 'N/A'}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Section:</strong></td>
-                            <td>${student.section || 'N/A'}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Status:</strong></td>
-                            <td>${getStatusBadge(student.status)}</td>
-                        </tr>
-                    </table>
-                </div>
-                <div class="col-md-6">
-                    <h6 class="text-primary">Enrollment Information</h6>
-                    <p><strong>Enrollment Date:</strong> ${enrollmentDate}</p>
-                    ${student.enrollments && student.enrollments.length > 0 ? `
-                        <p><strong>Enrolled Courses:</strong></p>
-                        <ul class="list-unstyled">
-                            ${student.enrollments.map(e => `<li>• ${e.course_name} (${e.course_code})</li>`).join('')}
-                        </ul>
-                    ` : '<p>No enrollment information available.</p>'}
-                </div>
-            </div>
-        `;
-
-        $('#studentDetailsContent').html(content);
     }
 
     // Handle status update form submission
@@ -426,6 +413,12 @@ $(document).ready(function() {
         e.preventDefault();
 
         const formData = new FormData(this);
+
+        // Add CSRF token to form data
+        const csrfToken = $('meta[name="csrf-token"]').attr('content') || getCookie('csrf_cookie_name');
+        if (csrfToken) {
+            formData.append('csrf_test_name', csrfToken);
+        }
 
         $.ajax({
             url: '<?= base_url('teacher/updateStudentStatus') ?>',

@@ -29,7 +29,7 @@
                             <label for="material" class="form-label">Select File</label>
                             <input type="file" class="form-control" id="material" name="material" required>
                             <div class="form-text">
-                                Allowed file types: PDF, DOC, DOCX, PPT, PPTX, TXT, JPG, JPEG, PNG. Maximum size: 10MB.
+                                Allowed file types: PDF, PPT, PPTX. Maximum size: 10MB.
                             </div>
                         </div>
 

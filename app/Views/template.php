@@ -33,7 +33,7 @@
     .notification-item:last-child {
       border-bottom: none;
     }
-    .badge {
+    #notificationBadge.badge {
       position: absolute;
       top: 5px;
       right: 5px;
@@ -90,13 +90,7 @@
 
             <!-- Role-specific dashboard links -->
             <?php if ($role === 'admin'): ?>
-              <li class="nav-item">
-                <a class="nav-link" href="<?= base_url('admin/dashboard') ?>">Dashboard</a>
-              </li>
             <?php elseif ($role === 'teacher'): ?>
-              <li class="nav-item">
-                <a class="nav-link" href="<?= base_url('teacher/dashboard') ?>">Dashboard</a>
-              </li>
             <?php else: ?>
               <li class="nav-item">
                 <a class="nav-link" href="<?= base_url('dashboard') ?>">Dashboard</a>

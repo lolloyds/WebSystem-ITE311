@@ -121,16 +121,14 @@ class CourseMaterials extends BaseController
         $allowedMimes = [
             'application/pdf',
             'application/vnd.ms-powerpoint',
-            'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-            'application/msword',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            'application/vnd.openxmlformats-officedocument.presentationml.presentation'
         ];
 
         $mimeType = $file->getClientMimeType();
         if (!in_array($mimeType, $allowedMimes)) {
             return $this->response->setJSON([
                 'status' => 'error',
-                'message' => 'Invalid file type. Only PDF, PPT, PPTX, DOC, DOCX allowed.'
+                'message' => 'Invalid file type. Only PDF and PPT files are allowed.'
             ])->setStatusCode(400);
         }
 

@@ -43,16 +43,25 @@ class Teacher extends BaseController
 
         // Get enrollment statistics for each course
         $enrollmentStats = [];
-        $totalEnrollments = 0;
+        $db = \Config\Database::connect();
 
+        // Count unique enrolled students across all teacher's courses
+        $uniqueStudentsResult = $db->table('enrollments e')
+            ->select('COUNT(DISTINCT e.user_id) as unique_students')
+            ->join('courses c', 'c.id = e.course_id')
+            ->where('c.teacher_id', $userId)
+            ->get()
+            ->getRowArray();
+
+        $totalEnrollments = $uniqueStudentsResult['unique_students'] ?? 0;
+
+        // Get enrollment counts per course (total enrollments per course)
         foreach ($courses as $course) {
-            $db = \Config\Database::connect();
             $enrollmentCount = $db->table('enrollments')
                 ->where('course_id', $course['id'])
                 ->countAllResults();
 
             $enrollmentStats[$course['id']] = $enrollmentCount;
-            $totalEnrollments += $enrollmentCount;
         }
 
         // Get recent enrollments (last 10)
@@ -221,10 +230,10 @@ class Teacher extends BaseController
             return $this->response->setJSON(['error' => 'Student not found']);
         }
 
-        // Get enrollment details for this teacher's courses
+        // Get enrollment details for this teacher's courses (for removal functionality)
         $db = \Config\Database::connect();
         $enrollments = $db->table('enrollments e')
-            ->select('e.enrolled_at, c.title as course_name, c.course_code')
+            ->select('e.enrolled_at, c.title as course_name, c.course_code, c.id as course_id, e.id as enrollment_id')
             ->join('courses c', 'c.id = e.course_id')
             ->where('e.user_id', $studentId)
             ->where('c.teacher_id', $teacherId)
@@ -292,15 +301,40 @@ class Teacher extends BaseController
             return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized to modify this course']);
         }
 
-        // Remove enrollment
-        $enrollmentModel = new \App\Models\EnrollmentModel();
+        // Check if the student is actually enrolled in this course
         $db = \Config\Database::connect();
-        $db->table('enrollments')->where('user_id', $studentId)->where('course_id', $courseId)->delete();
+        $enrollmentExists = $db->table('enrollments')
+            ->where('user_id', $studentId)
+            ->where('course_id', $courseId)
+            ->countAllResults() > 0;
 
-        return $this->response->setJSON([
-            'success' => true,
-            'message' => 'Student removed from course successfully'
-        ]);
+        if (!$enrollmentExists) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Student is not enrolled in this course']);
+        }
+
+        // Remove enrollment
+        $db->table('enrollments')
+            ->where('user_id', $studentId)
+            ->where('course_id', $courseId)
+            ->delete();
+
+        // Check if the deletion was successful by verifying the enrollment no longer exists
+        $stillEnrolled = $db->table('enrollments')
+            ->where('user_id', $studentId)
+            ->where('course_id', $courseId)
+            ->countAllResults() > 0;
+
+        if (!$stillEnrolled) {
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'Student removed from course successfully'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Failed to remove student from course'
+            ]);
+        }
     }
 
     public function getEnrollmentStats()
@@ -316,18 +350,25 @@ class Teacher extends BaseController
         $courseModel = new \App\Models\CourseModel();
         $courses = $courseModel->where('teacher_id', $teacherId)->findAll();
 
-        // Get enrollment statistics for each course
-        $enrollmentStats = [];
-        $totalEnrollments = 0;
+        // Count unique enrolled students across all teacher's courses
+        $db = \Config\Database::connect();
+        $uniqueStudentsResult = $db->table('enrollments e')
+            ->select('COUNT(DISTINCT e.user_id) as unique_students')
+            ->join('courses c', 'c.id = e.course_id')
+            ->where('c.teacher_id', $teacherId)
+            ->get()
+            ->getRowArray();
 
+        $totalEnrollments = $uniqueStudentsResult['unique_students'] ?? 0;
+
+        // Get enrollment counts per course (total enrollments per course)
+        $enrollmentStats = [];
         foreach ($courses as $course) {
-            $db = \Config\Database::connect();
             $enrollmentCount = $db->table('enrollments')
                 ->where('course_id', $course['id'])
                 ->countAllResults();
 
             $enrollmentStats[$course['id']] = $enrollmentCount;
-            $totalEnrollments += $enrollmentCount;
         }
 
         // Get recent enrollments (last 10)
