@@ -7,7 +7,6 @@
         <div class="col-12">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h2 class="card-title mb-3">Manage Students</h2>
                             <div class="mb-3">
@@ -31,10 +30,6 @@
                                 <?php endif; ?>
                             </p>
                         </div>
-                        <a href="<?= base_url('teacher/dashboard') ?>" class="btn btn-outline-secondary">
-                            <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
-                        </a>
-                    </div>
                 </div>
             </div>
         </div>
@@ -48,7 +43,7 @@
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0"><i class="bi bi-people me-2"></i>Enrolled Students</h5>
-                    <span id="studentCount" class="badge bg-light text-dark">0 students</span>
+                    <span id="studentCount" class="badge bg-light text-dark"><?= $studentCount ?> student<?= $studentCount !== 1 ? 's' : '' ?></span>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">

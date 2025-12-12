@@ -88,11 +88,6 @@
                                 <td class="align-middle"><?= esc($user['id']) ?></td>
                                 <td class="align-middle">
                                     <?= esc($user['name']) ?>
-                                    <?php if ($isProtected): ?>
-                                        <span class="badge bg-danger ms-1" title="Protected Admin Account">
-                                            <i class="bi bi-shield-check"></i> Protected
-                                        </span>
-                                    <?php endif; ?>
                                 </td>
                                 <td class="align-middle"><?= esc($user['email']) ?></td>
                                 <td class="align-middle">

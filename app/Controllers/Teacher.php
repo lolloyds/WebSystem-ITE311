@@ -157,7 +157,8 @@ class Teacher extends BaseController
         $data = [
             'title' => 'Manage Students',
             'courses' => $courses,
-            'enrolledStudents' => $enrolledStudents
+            'enrolledStudents' => $enrolledStudents,
+            'studentCount' => count($enrolledStudents)
         ];
 
         return view('teacher/manage_students', $data);
