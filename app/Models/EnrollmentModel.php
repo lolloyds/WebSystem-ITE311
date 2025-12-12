@@ -15,6 +15,7 @@ class EnrollmentModel extends Model
         'user_id',
         'course_id',
         'enrolled_at',
+        'status',
     ];
 
     protected $useTimestamps = false; // timestamps handled manually
@@ -38,7 +39,7 @@ class EnrollmentModel extends Model
     }
 
     /**
-     * Get all courses a user is enrolled in
+     * Get all approved courses a user is enrolled in
      *
      * @param int $user_id User ID
      * @return array Array of enrolled courses with course details
@@ -49,6 +50,7 @@ class EnrollmentModel extends Model
             ->select('e.*, c.title, c.description, c.created_at as course_created_at')
             ->join('courses c', 'c.id = e.course_id', 'left')
             ->where('e.user_id', $user_id)
+            ->where('e.status', 'approved') // Only show approved enrollments
             ->orderBy('e.enrolled_at', 'DESC')
             ->get()
             ->getResultArray();

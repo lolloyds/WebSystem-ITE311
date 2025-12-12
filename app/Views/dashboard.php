@@ -64,19 +64,37 @@ $userId = session()->get('userId');
 if ($userRole === 'student'):
     // Load enrolled courses for students
     $db = \Config\Database::connect();
-    $enrollments = $db->table('enrollments')
-                     ->select('courses.title, courses.description, enrollments.enrolled_at, courses.id as course_id')
-                     ->join('courses', 'courses.id = enrollments.course_id')
-                     ->where('enrollments.user_id', $userId)
-                     ->orderBy('enrollments.enrolled_at', 'DESC')
-                     ->get()
-                     ->getResultArray();
 
-    // Load available courses for students
+    // Get approved enrollments (enrolled courses)
+    $approvedEnrollments = $db->table('enrollments')
+                             ->select('courses.title, courses.description, enrollments.enrolled_at, courses.id as course_id')
+                             ->join('courses', 'courses.id = enrollments.course_id')
+                             ->where('enrollments.user_id', $userId)
+                             ->where('enrollments.status', 'approved')
+                             ->orderBy('enrollments.enrolled_at', 'DESC')
+                             ->get()
+                             ->getResultArray();
+
+    // Get pending enrollments
+    $pendingEnrollments = $db->table('enrollments')
+                            ->select('courses.title, courses.description, enrollments.enrolled_at, courses.id as course_id')
+                            ->join('courses', 'courses.id = enrollments.course_id')
+                            ->where('enrollments.user_id', $userId)
+                            ->where('enrollments.status', 'pending')
+                            ->orderBy('enrollments.enrolled_at', 'DESC')
+                            ->get()
+                            ->getResultArray();
+
+    // Load available courses for students (exclude both pending and approved enrollments)
+    $allEnrolledCourseIds = array_merge(
+        array_column($approvedEnrollments, 'course_id'),
+        array_column($pendingEnrollments, 'course_id')
+    );
+
     $availableCourses = $db->table('courses')
                           ->select('courses.*, users.name as teacher_name')
                           ->join('users', 'users.id = courses.teacher_id', 'left')
-                          ->whereNotIn('courses.id', array_column($enrollments, 'course_id') ?: [0])
+                          ->whereNotIn('courses.id', $allEnrolledCourseIds ?: [0])
                           ->orderBy('courses.created_at', 'DESC')
                           ->limit(6) // Limit to 6 for dashboard
                           ->get()
@@ -172,15 +190,51 @@ if ($userRole === 'student'):
     </div>
     <?php endif; ?>
 
+    <!-- Pending Enrollments Section -->
+    <?php if (!empty($pendingEnrollments)): ?>
+    <div class="card shadow-sm border-0 bg-dark text-light mb-4">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0"><i class="bi bi-clock me-2"></i>Pending Enrollment Approvals</h5>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <i class="bi bi-info-circle me-2"></i>
+                These courses are waiting for teacher approval. You will be able to access them once approved.
+            </div>
+            <div class="row">
+                <?php foreach ($pendingEnrollments as $enrollment): ?>
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100 bg-secondary text-light border-warning">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="card-title"><?= esc($enrollment['title']) ?></h6>
+                                    <span class="badge bg-warning">Pending Approval</span>
+                                </div>
+                                <p class="card-text small"><?= esc($enrollment['description']) ?></p>
+                                <small class="text-muted">Requested: <?= date('M d, Y', strtotime($enrollment['enrolled_at'])) ?></small>
+                            </div>
+                            <div class="card-footer bg-transparent">
+                                <button class="btn btn-outline-warning btn-sm w-100" disabled>
+                                    <i class="bi bi-hourglass-split me-1"></i>Waiting for Approval
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <!-- Enrolled Courses Section -->
     <div class="card shadow-sm border-0 bg-dark text-light mb-4">
         <div class="card-header bg-primary text-white">
             <h5 class="mb-0"><i class="bi bi-check-circle me-2"></i>My Enrolled Courses</h5>
         </div>
         <div class="card-body">
-            <?php if (!empty($enrollments)): ?>
+            <?php if (!empty($approvedEnrollments)): ?>
                 <div class="row">
-                    <?php foreach ($enrollments as $enrollment): ?>
+                    <?php foreach ($approvedEnrollments as $enrollment): ?>
                         <div class="col-md-6 mb-3">
                             <div class="card h-100 bg-secondary text-light">
                                 <div class="card-body">
@@ -201,7 +255,7 @@ if ($userRole === 'student'):
                     <?php endforeach; ?>
                 </div>
             <?php else: ?>
-                <p class="text-muted mb-0">You haven't enrolled in any courses yet.</p>
+                <p class="text-muted mb-0">You haven't been approved for any courses yet.</p>
             <?php endif; ?>
         </div>
     </div>

@@ -1,9 +1,12 @@
--- SQL script to add status column to users table
--- Run this script if you prefer to add the column manually instead of using migrations
+-- SQL script to update enrollments table status column
+-- Run this script to fix the status column enum values
 
-ALTER TABLE `users` 
-ADD COLUMN `status` ENUM('active', 'inactive') DEFAULT 'active' AFTER `role`;
+-- First, update all existing 'active' statuses to 'approved'
+UPDATE `enrollments` SET `status` = 'approved' WHERE `status` = 'active';
 
--- Update all existing users to 'active' status (if needed)
-UPDATE `users` SET `status` = 'active' WHERE `status` IS NULL;
+-- Modify the status column to use correct enum values with 'pending' as default
+ALTER TABLE `enrollments`
+MODIFY COLUMN `status` ENUM('pending', 'approved', 'rejected') DEFAULT 'pending';
 
+-- Update any remaining old values that don't match the new enum
+UPDATE `enrollments` SET `status` = 'pending' WHERE `status` NOT IN ('pending', 'approved', 'rejected');

@@ -67,10 +67,11 @@ class Course extends BaseController
             ]);
         }
 
-        // Prepare enrollment data
+        // Prepare enrollment data - set status to pending for teacher approval
         $enrollmentData = [
             'user_id' => $user_id,
             'course_id' => $course_id,
+            'status' => 'pending',
             'enrolled_at' => (new \DateTime('now', new \DateTimeZone(config('App')->appTimezone ?? 'UTC')))->format(\DateTime::ATOM)
         ];
 
@@ -201,6 +202,36 @@ class Course extends BaseController
 
         if (!$course) {
             throw new \CodeIgniter\Exceptions\PageNotFoundException('Course not found');
+        }
+
+        // Check if user is logged in
+        $session = session();
+        if (!$session->get('isAuthenticated')) {
+            return redirect()->to('/login')->with('error', 'You must be logged in to view courses.');
+        }
+
+        $userId = $session->get('userId');
+        $userRole = $session->get('userRole');
+
+        // Teachers can view their own courses, admins can view all courses
+        if ($userRole === 'teacher') {
+            if ($course['teacher_id'] != $userId) {
+                throw new \CodeIgniter\Exceptions\PageNotFoundException('Course not found');
+            }
+        } elseif ($userRole === 'admin') {
+            // Admins can view all courses
+        } elseif ($userRole === 'student') {
+            // Students can only view courses they're approved for
+            $enrollment = $db->table('enrollments')
+                            ->where('user_id', $userId)
+                            ->where('course_id', $id)
+                            ->where('status', 'approved')
+                            ->get()
+                            ->getRowArray();
+
+            if (!$enrollment) {
+                return redirect()->to('/dashboard')->with('error', 'You do not have access to this course or your enrollment is still pending approval.');
+            }
         }
 
         $data['course'] = $course;

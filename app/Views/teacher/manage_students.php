@@ -55,6 +55,7 @@
                                     <th>Email</th>
                                     <th>Program</th>
                                     <th>Year Level</th>
+                                    <th>Course</th>
                                     <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
@@ -68,23 +69,28 @@
                                             <td><?= esc($student['email']) ?></td>
                                             <td><?= esc($student['program'] ?? 'N/A') ?></td>
                                             <td><?= esc($student['year_level'] ?? 'N/A') ?></td>
+                                            <td><?= esc($student['course_name']) ?></td>
                                             <td>
                                                 <?php
-                                                $status = $student['status'] ?? 'active';
-                                                if ($status === 'active') {
-                                                    echo '<span class="badge bg-success">Active</span>';
+                                                $status = $student['status'] ?? 'pending';
+                                                if ($status === 'approved') {
+                                                    echo '<span class="badge bg-success">Enrolled</span>';
+                                                } elseif ($status === 'pending') {
+                                                    echo '<span class="badge bg-warning">Pending</span>';
+                                                } elseif ($status === 'rejected') {
+                                                    echo '<span class="badge bg-danger">Rejected</span>';
                                                 } else {
-                                                    echo '<span class="badge bg-warning">Inactive</span>';
+                                                    echo '<span class="badge bg-secondary">' . ucfirst($status) . '</span>';
                                                 }
                                                 ?>
                                             </td>
                                             <td>
-                                                <div class="btn-group" role="group">
-                                                    <button class="btn btn-sm btn-outline-warning" onclick="updateStudentStatus(<?= $student['id'] ?>, '<?= $student['status'] ?? 'active' ?>')">
-                                                        <i class="bi bi-check-circle"></i> Approve/Reject
+                                                <div class="d-flex gap-2">
+                                                    <button type="button" class="btn btn-sm btn-outline-success approve-btn" data-student-id="<?= $student['id'] ?>" data-course-id="<?= $student['course_id'] ?>" data-student-name="<?= addslashes($student['name']) ?>" data-course-name="<?= addslashes($student['course_name']) ?>" onclick="approveStudent(this.dataset.studentId, this.dataset.courseId, this.dataset.studentName, this.dataset.courseName)" style="cursor: pointer;">
+                                                        <i class="bi bi-check-circle"></i> Approve
                                                     </button>
-                                                    <button class="btn btn-sm btn-outline-danger" onclick="removeFromCourse(<?= $student['id'] ?>, '<?= addslashes($student['name']) ?>', <?= $student['course_id'] ?>, '<?= addslashes($student['course_name']) ?>')">
-                                                        <i class="bi bi-person-dash"></i> Remove
+                                                    <button type="button" class="btn btn-sm btn-outline-danger reject-btn" data-student-id="<?= $student['id'] ?>" data-course-id="<?= $student['course_id'] ?>" data-student-name="<?= addslashes($student['name']) ?>" data-course-name="<?= addslashes($student['course_name']) ?>" onclick="rejectStudent(this.dataset.studentId, this.dataset.courseId, this.dataset.studentName, this.dataset.courseName)" style="cursor: pointer;">
+                                                        <i class="bi bi-x-circle"></i> Reject
                                                     </button>
                                                 </div>
                                             </td>
@@ -147,9 +153,8 @@
                     <div class="mb-3">
                         <label for="newStatus" class="form-label">Action <span class="text-danger">*</span></label>
                         <select class="form-select" id="newStatus" name="new_status" required>
-                            <option value="active">Approve Student (Active)</option>
-                            <option value="inactive">Reject Student (Inactive)</option>
-                            <option value="dropped">Drop Student</option>
+                            <option value="approved">Approve Student</option>
+                            <option value="rejected">Reject Student</option>
                         </select>
                     </div>
                     <div class="mb-3">
@@ -159,6 +164,7 @@
                 </div>
                 <div class="modal-footer">
                     <input type="hidden" id="statusStudentId" name="student_id">
+                    <input type="hidden" id="statusCourseId" name="course_id">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-success">
                         <i class="bi bi-check-circle me-1"></i>Approve/Reject
@@ -236,10 +242,14 @@ window.displayStudentDetails = function(student) {
 };
 
 window.getStatusBadgeGlobal = function(status) {
-    if (status === 'active') {
-        return '<span class="badge bg-success">Active</span>';
+    if (status === 'approved') {
+        return '<span class="badge bg-success">Enrolled</span>';
+    } else if (status === 'pending') {
+        return '<span class="badge bg-warning">Pending</span>';
+    } else if (status === 'rejected') {
+        return '<span class="badge bg-danger">Rejected</span>';
     } else {
-        return '<span class="badge bg-warning">Inactive</span>';
+        return '<span class="badge bg-secondary">' + status.charAt(0).toUpperCase() + status.slice(1) + '</span>';
     }
 };
 
@@ -262,32 +272,78 @@ window.viewStudentDetails = function(studentId) {
     });
 };
 
-window.updateStudentStatus = function(studentId, currentStatus) {
+window.updateStudentStatus = function(studentId, courseId, currentStatus) {
     $('#statusStudentId').val(studentId);
+    $('#statusCourseId').val(courseId);
     $('#currentStatus').val(currentStatus.charAt(0).toUpperCase() + currentStatus.slice(1));
     $('#newStatus').val(currentStatus);
     $('#statusRemarks').val('');
     $('#statusUpdateModal').modal('show');
 };
 
+window.rejectStudent = function(studentId, courseId, studentName, courseName) {
+    if (confirm(`Are you sure you want to reject ${studentName} from "${courseName}"? The student will be marked as rejected.`)) {
+        updateEnrollmentStatus(studentId, courseId, 'rejected');
+    }
+};
+
+window.approveStudent = function(studentId, courseId, studentName, courseName) {
+    if (confirm(`Are you sure you want to approve ${studentName} for "${courseName}"?`)) {
+        updateEnrollmentStatus(studentId, courseId, 'approved');
+    }
+};
+
+window.updateEnrollmentStatus = function(studentId, courseId, newStatus) {
+    // Get CSRF token
+    const csrfToken = $('meta[name="X-CSRF-TOKEN"]').attr('content') || getCookie('csrf_cookie_name');
+
+    const data = {
+        student_id: studentId,
+        course_id: courseId,
+        new_status: newStatus
+    };
+
+    const ajaxOptions = {
+        url: '<?= base_url('teacher/updateStudentStatus') ?>',
+        type: 'POST',
+        data: data,
+        success: function(response) {
+            if (response.success) {
+                alert(response.message);
+                const selectedCourseId = $('#courseSelect').val();
+                loadStudents(selectedCourseId); // Reload the table with current course filter
+            } else {
+                alert('Error: ' + (response.message || 'Failed to update enrollment status.'));
+            }
+        },
+        error: function(xhr, status, error) {
+            alert('AJAX Error: ' + xhr.status + ' - ' + error);
+        }
+    };
+
+    if (csrfToken) {
+        ajaxOptions.headers = {
+            'X-CSRF-TOKEN': csrfToken
+        };
+    }
+
+    $.ajax(ajaxOptions);
+};
+
 window.removeFromCourse = function(studentId, studentName, courseId, courseName) {
     if (confirm(`Are you sure you want to remove ${studentName} from "${courseName}"?`)) {
-        const formData = new FormData();
-        formData.append('student_id', studentId);
-        formData.append('course_id', courseId);
+        // Get CSRF token
+        const csrfToken = $('meta[name="X-CSRF-TOKEN"]').attr('content') || getCookie('csrf_cookie_name');
 
-        // Add CSRF token to form data
-        const csrfToken = $('meta[name="csrf-token"]').attr('content') || getCookie('csrf_cookie_name');
-        if (csrfToken) {
-            formData.append('csrf_test_name', csrfToken);
-        }
+        const data = {
+            student_id: studentId,
+            course_id: courseId
+        };
 
-        $.ajax({
+        const ajaxOptions = {
             url: '<?= base_url('teacher/removeStudentFromCourse') ?>',
             type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
+            data: data,
             success: function(response) {
                 if (response.success) {
                     alert(response.message);
@@ -297,10 +353,18 @@ window.removeFromCourse = function(studentId, studentName, courseId, courseName)
                     alert(response.message || 'Failed to remove student from course.');
                 }
             },
-            error: function() {
+            error: function(xhr, status, error) {
                 alert('An error occurred. Please try again.');
             }
-        });
+        };
+
+        if (csrfToken) {
+            ajaxOptions.headers = {
+                'X-CSRF-TOKEN': csrfToken
+            };
+        }
+
+        $.ajax(ajaxOptions);
     }
 };
 
@@ -316,6 +380,33 @@ $(document).ready(function() {
         const selectedCourseId = $(this).val();
         loadStudents(selectedCourseId);
     });
+
+    // Handle approve button clicks using event delegation
+    $(document).on('click', '.approve-btn', function(e) {
+        e.preventDefault();
+        console.log('Approve button clicked!');
+        const studentId = $(this).data('student-id');
+        const courseId = $(this).data('course-id');
+        const studentName = $(this).data('student-name');
+        const courseName = $(this).data('course-name');
+        console.log('Button data:', {studentId, courseId, studentName, courseName});
+        approveStudent(studentId, courseId, studentName, courseName);
+    });
+
+    // Handle reject button clicks using event delegation
+    $(document).on('click', '.reject-btn', function(e) {
+        e.preventDefault();
+        console.log('Reject button clicked!');
+        const studentId = $(this).data('student-id');
+        const courseId = $(this).data('course-id');
+        const studentName = $(this).data('student-name');
+        const courseName = $(this).data('course-name');
+        console.log('Button data:', {studentId, courseId, studentName, courseName});
+        rejectStudent(studentId, courseId, studentName, courseName);
+    });
+
+    // Debug: Check if event handlers are attached
+    console.log('Event handlers attached. Approve buttons:', $('.approve-btn').length, 'Reject buttons:', $('.reject-btn').length);
 
     // Auto-refresh students list every 30 seconds to show newly enrolled students
     setInterval(function() {
@@ -367,6 +458,7 @@ $(document).ready(function() {
 
         students.forEach(function(student) {
             const statusBadge = getStatusBadge(student.status);
+
             const row = `
                 <tr>
                     <td>${student.student_id || 'N/A'}</td>
@@ -374,14 +466,15 @@ $(document).ready(function() {
                     <td>${student.email}</td>
                     <td>${student.program || 'N/A'}</td>
                     <td>${student.year_level || 'N/A'}</td>
+                    <td>${student.course_name}</td>
                     <td>${statusBadge}</td>
                     <td>
-                        <div class="btn-group" role="group">
-                            <button class="btn btn-sm btn-outline-warning" onclick="updateStudentStatus(${student.id}, '${student.status || 'active'}')">
-                                <i class="bi bi-check-circle"></i> Approve/Reject
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-sm btn-outline-success approve-btn" data-student-id="${student.id}" data-course-id="${student.course_id}" data-student-name="${student.name.replace(/"/g, '"')}" data-course-name="${student.course_name.replace(/"/g, '"')}" onclick="approveStudent(this.dataset.studentId, this.dataset.courseId, this.dataset.studentName, this.dataset.courseName)" style="cursor: pointer;">
+                                <i class="bi bi-check-circle"></i> Approve
                             </button>
-                            <button class="btn btn-sm btn-outline-danger" onclick="removeFromCourse(${student.id}, '${student.name.replace(/'/g, "\\'")}', ${student.course_id}, '${student.course_name.replace(/'/g, "\\'")}')">
-                                <i class="bi bi-person-dash"></i> Remove
+                            <button type="button" class="btn btn-sm btn-outline-danger reject-btn" data-student-id="${student.id}" data-course-id="${student.course_id}" data-student-name="${student.name.replace(/"/g, '"')}" data-course-name="${student.course_name.replace(/"/g, '"')}" onclick="rejectStudent(this.dataset.studentId, this.dataset.courseId, this.dataset.studentName, this.dataset.courseName)" style="cursor: pointer;">
+                                <i class="bi bi-x-circle"></i> Reject
                             </button>
                         </div>
                     </td>
@@ -396,10 +489,15 @@ $(document).ready(function() {
     }
 
     function getStatusBadge(status) {
-        if (status === 'active') {
-            return '<span class="badge bg-success">Active</span>';
+        status = status || 'pending'; // Default to pending if status is null/undefined
+        if (status === 'approved') {
+            return '<span class="badge bg-success">Enrolled</span>';
+        } else if (status === 'pending') {
+            return '<span class="badge bg-warning">Pending</span>';
+        } else if (status === 'rejected') {
+            return '<span class="badge bg-danger">Rejected</span>';
         } else {
-            return '<span class="badge bg-warning">Inactive</span>';
+            return '<span class="badge bg-secondary">' + status.charAt(0).toUpperCase() + status.slice(1) + '</span>';
         }
     }
 
@@ -407,20 +505,20 @@ $(document).ready(function() {
     $('#statusUpdateForm').on('submit', function(e) {
         e.preventDefault();
 
-        const formData = new FormData(this);
+        // Get CSRF token
+        const csrfToken = $('meta[name="X-CSRF-TOKEN"]').attr('content') || getCookie('csrf_cookie_name');
 
-        // Add CSRF token to form data
-        const csrfToken = $('meta[name="csrf-token"]').attr('content') || getCookie('csrf_cookie_name');
-        if (csrfToken) {
-            formData.append('csrf_test_name', csrfToken);
-        }
+        const data = {
+            student_id: $('#statusStudentId').val(),
+            course_id: $('#statusCourseId').val(),
+            new_status: $('#newStatus').val(),
+            remarks: $('#statusRemarks').val()
+        };
 
-        $.ajax({
+        const ajaxOptions = {
             url: '<?= base_url('teacher/updateStudentStatus') ?>',
             type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
+            data: data,
             success: function(response) {
                 if (response.success) {
                     $('#statusUpdateModal').modal('hide');
@@ -434,7 +532,15 @@ $(document).ready(function() {
             error: function() {
                 alert('An error occurred. Please try again.');
             }
-        });
+        };
+
+        if (csrfToken) {
+            ajaxOptions.headers = {
+                'X-CSRF-TOKEN': csrfToken
+            };
+        }
+
+        $.ajax(ajaxOptions);
     });
 });
 </script>

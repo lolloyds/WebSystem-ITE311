@@ -142,12 +142,11 @@ class Teacher extends BaseController
         // Get enrolled students for initial display (all enrolled students for this teacher)
         $db = \Config\Database::connect();
         $enrolledStudents = $db->table('enrollments e')
-            ->select('u.id, u.student_id, u.name, u.email, u.program, u.year_level, u.section, u.status, e.enrolled_at, c.title as course_name, c.id as course_id')
+            ->select('u.id, u.student_id, u.name, u.email, u.program, u.year_level, u.section, e.status, e.enrolled_at, c.title as course_name, c.id as course_id, e.id as enrollment_id')
             ->join('users u', 'u.id = e.user_id')
             ->join('courses c', 'c.id = e.course_id')
             ->where('c.teacher_id', $userId)
             ->where('u.role', 'student')
-            ->groupBy('u.id')
             ->orderBy('u.name')
             ->get()
             ->getResultArray();
@@ -181,7 +180,7 @@ class Teacher extends BaseController
         // Build query to get enrolled students for teacher's courses
         $db = \Config\Database::connect();
         $builder = $db->table('enrollments e')
-            ->select('u.id, u.student_id, u.name, u.email, u.program, u.year_level, u.section, u.status, e.enrolled_at, c.title as course_name, c.id as course_id')
+            ->select('u.id, u.student_id, u.name, u.email, u.program, u.year_level, u.section, e.status, e.enrolled_at, c.title as course_name, c.id as course_id')
             ->join('users u', 'u.id = e.user_id')
             ->join('courses c', 'c.id = e.course_id')
             ->where('c.teacher_id', $teacherId)
@@ -202,14 +201,17 @@ class Teacher extends BaseController
             $builder->where('u.year_level', $yearLevel);
         }
         if (!empty($status)) {
-            $builder->where('u.status', $status);
+            $builder->where('e.status', $status); // Changed from u.status to e.status
         }
         if (!empty($program)) {
             $builder->where('u.program', $program);
         }
 
-        // Remove duplicates (student might be enrolled in multiple courses)
-        $builder->groupBy('u.id');
+        // Only group by student if we're filtering by a specific course
+        // Otherwise show each enrollment as a separate row
+        if (!empty($courseId)) {
+            $builder->groupBy('u.id');
+        }
 
         $students = $builder->orderBy('u.name')->get()->getResultArray();
 
@@ -248,37 +250,113 @@ class Teacher extends BaseController
 
     public function updateStudentStatus()
     {
+
         // Verify user authentication and role
         if (!session()->get('isAuthenticated') || session()->get('userRole') !== 'teacher') {
-            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+            log_message('error', 'Unauthorized access to updateStudentStatus');
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized access']);
         }
 
         $studentId = $this->request->getPost('student_id');
+        $courseId = $this->request->getPost('course_id');
         $newStatus = $this->request->getPost('new_status');
         $remarks = $this->request->getPost('remarks');
+        $teacherId = session()->get('userId');
 
-        // Validate status
-        if (!in_array($newStatus, ['active', 'inactive', 'dropped'])) {
-            return $this->response->setJSON(['success' => false, 'message' => 'Invalid status']);
+        log_message('info', "updateStudentStatus called - teacher: $teacherId, student: $studentId, course: $courseId, newStatus: $newStatus");
+
+        // Validate required parameters
+        if (!$studentId || !$courseId || !$newStatus) {
+            log_message('error', "Missing required parameters: student_id=$studentId, course_id=$courseId, new_status=$newStatus");
+            return $this->response->setJSON(['success' => false, 'message' => 'Missing required parameters']);
         }
 
-        $userModel = new \App\Models\UserModel();
-        $student = $userModel->find($studentId);
-
-        if (!$student || $student['role'] !== 'student') {
-            return $this->response->setJSON(['success' => false, 'message' => 'Student not found']);
-        }
-
-        // Update student status
-        if ($userModel->update($studentId, ['status' => $newStatus])) {
-            return $this->response->setJSON([
-                'success' => true,
-                'message' => 'Student status updated successfully'
-            ]);
+        // For direct status updates (reject/approve), the status should already be the correct enrollment status
+        if (in_array($newStatus, ['approved', 'rejected', 'pending'])) {
+            $enrollmentStatus = $newStatus;
         } else {
+            // Validate status - map UI statuses to enrollment statuses
+            $statusMapping = [
+                'active' => 'approved',
+                'inactive' => 'rejected',
+                'dropped' => 'rejected'
+            ];
+
+            if (!isset($statusMapping[$newStatus])) {
+                log_message('error', "Invalid status provided: $newStatus");
+                return $this->response->setJSON(['success' => false, 'message' => 'Invalid status']);
+            }
+
+            $enrollmentStatus = $statusMapping[$newStatus];
+        }
+
+        log_message('info', "Mapped status $newStatus to enrollment status $enrollmentStatus");
+
+        // Verify the course belongs to this teacher
+        $courseModel = new \App\Models\CourseModel();
+        $course = $courseModel->where('id', $courseId)->where('teacher_id', $teacherId)->first();
+
+        if (!$course) {
+            log_message('error', "Course $courseId does not belong to teacher $teacherId - course not found or wrong teacher");
+            return $this->response->setJSON(['success' => false, 'message' => 'Course not found or you do not have permission to modify this course']);
+        }
+
+        log_message('info', "Course ownership verified: course $courseId belongs to teacher $teacherId");
+
+        // Check if the student is enrolled in this course
+        $enrollmentModel = new \App\Models\EnrollmentModel();
+        $enrollment = $enrollmentModel->where('user_id', $studentId)
+                                     ->where('course_id', $courseId)
+                                     ->first();
+
+        if (!$enrollment) {
+            log_message('error', "Student $studentId is not enrolled in course $courseId");
+            return $this->response->setJSON(['success' => false, 'message' => "Student $studentId is not enrolled in course $courseId"]);
+        }
+
+        log_message('info', "Found enrollment ID: {$enrollment['id']} for student $studentId in course $courseId, current status: {$enrollment['status']}");
+
+        // Update enrollment status
+        try {
+            log_message('info', "Attempting to update enrollment ID {$enrollment['id']} to status $enrollmentStatus");
+
+            $updateResult = $enrollmentModel->update($enrollment['id'], ['status' => $enrollmentStatus]);
+
+            log_message('info', "Update result: " . ($updateResult ? 'true' : 'false'));
+
+            if ($updateResult) {
+                log_message('info', "Successfully updated enrollment ID {$enrollment['id']} to status $enrollmentStatus");
+
+                // Verify the update actually worked
+                $verifiedEnrollment = $enrollmentModel->find($enrollment['id']);
+                log_message('info', "Verified status in database: " . ($verifiedEnrollment ? $verifiedEnrollment['status'] : 'NOT FOUND'));
+
+                return $this->response->setJSON([
+                    'success' => true,
+                    'message' => 'Student enrollment status updated successfully'
+                ]);
+            } else {
+                log_message('error', "Update returned false for enrollment ID {$enrollment['id']}");
+
+                // Get the last query for debugging
+                $lastQuery = $enrollmentModel->db->getLastQuery();
+                log_message('error', "Last query: " . $lastQuery);
+
+                // Check if there are any database errors
+                $dbError = $enrollmentModel->db->error();
+                log_message('error', "Database error: " . json_encode($dbError));
+
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Failed to update enrollment status in database. DB Error: ' . ($dbError['message'] ?? 'Unknown error')
+                ]);
+            }
+        } catch (\Exception $e) {
+            log_message('error', "Exception during status update: " . $e->getMessage());
+            log_message('error', "Exception trace: " . $e->getTraceAsString());
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'Failed to update student status'
+                'message' => 'Database error: ' . $e->getMessage()
             ]);
         }
     }
@@ -287,6 +365,7 @@ class Teacher extends BaseController
     {
         // Verify user authentication and role
         if (!session()->get('isAuthenticated') || session()->get('userRole') !== 'teacher') {
+            log_message('error', 'Unauthorized access to removeStudentFromCourse');
             return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
         }
 
@@ -294,46 +373,56 @@ class Teacher extends BaseController
         $courseId = $this->request->getPost('course_id');
         $teacherId = session()->get('userId');
 
+        log_message('info', "removeStudentFromCourse called - teacher: $teacherId, student: $studentId, course: $courseId");
+
         // Verify the course belongs to this teacher
         $courseModel = new \App\Models\CourseModel();
         $course = $courseModel->where('id', $courseId)->where('teacher_id', $teacherId)->first();
 
         if (!$course) {
+            log_message('error', "Course $courseId does not belong to teacher $teacherId");
             return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized to modify this course']);
         }
 
         // Check if the student is actually enrolled in this course
         $db = \Config\Database::connect();
-        $enrollmentExists = $db->table('enrollments')
+        $enrollment = $db->table('enrollments')
             ->where('user_id', $studentId)
             ->where('course_id', $courseId)
-            ->countAllResults() > 0;
+            ->get()
+            ->getRowArray();
 
-        if (!$enrollmentExists) {
+        if (!$enrollment) {
+            log_message('error', "Student $studentId is not enrolled in course $courseId");
             return $this->response->setJSON(['success' => false, 'message' => 'Student is not enrolled in this course']);
         }
 
-        // Remove enrollment
-        $db->table('enrollments')
-            ->where('user_id', $studentId)
-            ->where('course_id', $courseId)
-            ->delete();
+        log_message('info', "Found enrollment ID: {$enrollment['id']} for student $studentId in course $courseId");
 
-        // Check if the deletion was successful by verifying the enrollment no longer exists
-        $stillEnrolled = $db->table('enrollments')
-            ->where('user_id', $studentId)
-            ->where('course_id', $courseId)
-            ->countAllResults() > 0;
+        // Try to delete using the enrollment ID to be more specific
+        try {
+            $deleteResult = $db->table('enrollments')
+                ->where('id', $enrollment['id'])
+                ->delete();
 
-        if (!$stillEnrolled) {
-            return $this->response->setJSON([
-                'success' => true,
-                'message' => 'Student removed from course successfully'
-            ]);
-        } else {
+            if ($deleteResult) {
+                log_message('info', "Successfully deleted enrollment ID {$enrollment['id']}");
+                return $this->response->setJSON([
+                    'success' => true,
+                    'message' => 'Student removed from course successfully'
+                ]);
+            } else {
+                log_message('error', "Delete query failed for enrollment ID {$enrollment['id']}");
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Failed to remove student from course'
+                ]);
+            }
+        } catch (\Exception $e) {
+            log_message('error', "Exception during deletion: " . $e->getMessage());
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'Failed to remove student from course'
+                'message' => 'Database error: ' . $e->getMessage()
             ]);
         }
     }
